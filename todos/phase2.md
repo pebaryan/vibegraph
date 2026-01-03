@@ -1,7 +1,7 @@
 ## Phase 2: Frontend Foundation
 
 ### Core Frontend Setup
-- Change all references from React.js to Angular
+- Initialize Angular application with Angular Material for styling
 - Update frontend setup to use Angular Material for styling
 - Modify project structure to align with Angular application architecture
 - Configure Angular application with proper folder organization for components, services, and utilities

@@ -1,0 +1,38 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\title{Scientific Article Title}
+\author{Author Name}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This is the abstract. Replace with your content.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+\input{sections/introduction.tex}
+
+\section{Method}
+\input{sections/method.tex}
+
+\section{Results}
+\input{sections/results.tex}
+
+\section{Discussion}
+\input{sections/discussion.tex}
+
+\section{Conclusion}
+\input{sections/conclusion.tex}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

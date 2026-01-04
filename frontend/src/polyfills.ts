@@ -1,1 +1,1 @@
-// Import polyfills if needed
+import 'zone.js';

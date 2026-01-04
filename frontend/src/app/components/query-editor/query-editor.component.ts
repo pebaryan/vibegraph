@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
 import { QueryService } from '@app/services/query.service';
 import { AppState } from '@app/state/app.state';
+import { AfterViewInit } from '@angular/core';
 
 @Component({
   selector: 'app-query-editor',
   templateUrl: './query-editor.component.html',
   styleUrls: ['./query-editor.component.css']
 })
-import { AfterViewInit } from '@angular/core';
-import * as monaco from 'monaco-editor';
-
 export class QueryEditorComponent implements AfterViewInit {
   query: string = '';
   loading = false;
@@ -24,9 +22,9 @@ export class QueryEditorComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     // Register SPARQL language if not already registered
-    if (!monaco.languages.getLanguages().some(l => l.id === 'sparql')) {
-      monaco.languages.register({ id: 'sparql' });
-    }
+    // if (!monaco.languages.getLanguages().some(l => l.id === 'sparql')) {
+    //   monaco.languages.register({ id: 'sparql' });
+    // }
   }
 
   execute() {

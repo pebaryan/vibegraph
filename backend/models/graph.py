@@ -23,6 +23,21 @@ class Graph:
             'data': self.data
         }
 
+    def serialize(self, directory):
+        """Persist the RDF graph to a Turtle file inside the given directory."""
+        if not os.path.isdir(directory):
+            os.makedirs(directory, exist_ok=True)
+        file_path = os.path.join(directory, f"{self.graph_id}.ttl")
+        self.graph.serialize(file_path, format='turtle')
+
+    @staticmethod
+    def load_from_file(file_path, graph_id, name, created_at):
+        """Load an RDF graph from a Turtle file and return a Graph instance."""
+        graph = Graph(graph_id, name, created_at)
+        if os.path.exists(file_path):
+            graph.graph.parse(file_path, format='turtle')
+        return graph
+
 class GraphManager:
     def __init__(self, data_file='graph_data.json'):
         # Store metadata and actual Graph objects separately
@@ -33,7 +48,8 @@ class GraphManager:
         self._load()
 
     def _load(self):
-        """Load graph metadata from JSON file if it exists."""
+        """Load graph metadata and RDF data from storage."""
+        # Load metadata
         if os.path.exists(self.data_file):
             with open(self.data_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -41,11 +57,27 @@ class GraphManager:
                     graph = Graph(graph_id, meta.get('name', ''), meta.get('created_at', ''))
                     self.graphs[graph_id] = meta
                     self.graph_objs[graph_id] = graph
+        # Load RDF data files
+        data_dir = os.path.join(os.path.dirname(self.data_file), 'graphs_data')
+        if os.path.isdir(data_dir):
+            for fname in os.listdir(data_dir):
+                if fname.endswith('.ttl'):
+                    gid = fname[:-4]
+                    if gid in self.graph_objs:
+                        file_path = os.path.join(data_dir, fname)
+                        self.graph_objs[gid] = Graph.load_from_file(file_path, gid, self.graphs[gid].get('name', ''), self.graphs[gid].get('created_at', ''))
 
     def _save(self):
-        """Persist current graph metadata to JSON file."""
+        """Persist current graph metadata and RDF data to storage."""
+        # Ensure data directory exists
+        data_dir = os.path.join(os.path.dirname(self.data_file), 'graphs_data')
+        os.makedirs(data_dir, exist_ok=True)
+        # Save metadata
         with open(self.data_file, 'w', encoding='utf-8') as f:
             json.dump(self.graphs, f, indent=2)
+        # Save each graph's RDF data
+        for gid, graph in self.graph_objs.items():
+            graph.serialize(data_dir)
 
     def create_graph(self, name):
         """Create a new graph with a unique identifier"""
@@ -87,4 +119,5 @@ class GraphManager:
             return True
         return False
 
-    # TODO: Persist RDF graph data if required
+    # Persist RDF graph data in Turtle format per graph
+# Each graph's RDF data is stored in "graphs_data/<graph_id>.ttl"

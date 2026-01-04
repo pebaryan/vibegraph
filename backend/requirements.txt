@@ -2,3 +2,4 @@ flask
 flask-cors
 rdflib
 whoosh
+flasgger==0.9.7.1

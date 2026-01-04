@@ -1,14 +1,16 @@
-from flask import jsonify, request
-from backend.app import app
-from backend.routes.graphs import graph_manager
-from backend.models.query import SPARQLQueryProcessor
+from flask import Blueprint, jsonify, request
+from routes.graphs import graph_manager
+from models.query import SPARQLQueryProcessor
 
 # Initialize SPARQL query processor
 sparql_processor = SPARQLQueryProcessor()
 
+# Create a Blueprint instead of using @app
+query_bp = Blueprint('query_bp', __name__)
+
 # Routes for SPARQL query interface
 # Execute a SPARQL query
-@app.route('/api/queries', methods=['POST'])
+@query_bp.route('/api/queries', methods=['POST'])
 def execute_query():
     data = request.get_json()
     query = data.get('query')
@@ -40,7 +42,7 @@ def execute_query():
         return jsonify({'error': str(e)}), 400
 
 # Get query history
-@app.route('/api/queries/history', methods=['GET'])
+@query_bp.route('/api/queries/history', methods=['GET'])
 def get_query_history():
     # This is a simplified implementation - in a real application,
     # you would retrieve the query history from a persistent storage
@@ -67,7 +69,7 @@ def get_query_history():
     return jsonify({'history': mock_history})
 
 # Get query results by ID
-@app.route('/api/queries/<query_id>', methods=['GET'])
+@query_bp.route('/api/queries/<query_id>', methods=['GET'])
 def get_query_result(query_id):
     # This is a simplified implementation - in a real application,
     # you would retrieve the query result by ID from a persistent storage

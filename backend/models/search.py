@@ -1,7 +1,7 @@
 from whoosh.index import create_in, open_dir
 from whoosh.fields import ID, TEXT, STORED, Schema
 from whoosh.qparser import QueryParser
-from whoosh.analysis import StandardTokenizer
+from whoosh.analysis import StandardAnalyzer
 import os
 import json
 import uuid

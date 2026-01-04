@@ -1,14 +1,16 @@
-from flask import jsonify, request
-from backend.app import app
-from backend.models.graph import GraphManager
-from backend.routes.search import search_engine
+from flask import Blueprint, jsonify, request
+from models.graph import GraphManager
+from routes.search import search_engine
 
 # Initialize graph manager
 graph_manager = GraphManager()
 
+# Create a Blueprint instead of using @app
+graph_bp = Blueprint('graph_bp', __name__)
+
 # Routes for graph management
 # Create a new graph
-@app.route('/api/graphs', methods=['POST'])
+@graph_bp.route('/api/graphs', methods=['POST'])
 def create_graph():
     data = request.get_json()
     name = data.get('name')
@@ -19,10 +21,10 @@ def create_graph():
     return jsonify(result), 201
 
 # List all graphs
-@app.route('/api/graphs', methods=['GET'])
+@graph_bp.route('/api/graphs', methods=['GET'])
 
 # Upload RDF file for a graph
-@app.route('/api/graphs/<graph_id>/upload', methods=['POST'])
+@graph_bp.route('/api/graphs/<graph_id>/upload', methods=['POST'])
 def upload_graph(graph_id):
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
@@ -46,7 +48,7 @@ def list_graphs():
     return jsonify({'graphs': graphs})
 
 # Get a specific graph by ID
-@app.route('/api/graphs/<graph_id>', methods=['GET'])
+@graph_bp.route('/api/graphs/<graph_id>', methods=['GET'])
 def get_graph(graph_id):
     graph = graph_manager.get_graph(graph_id)
     if graph:
@@ -54,14 +56,14 @@ def get_graph(graph_id):
     return jsonify({'error': 'Graph not found'}), 404
 
 # Delete a graph by ID
-@app.route('/api/graphs/<graph_id>', methods=['DELETE'])
+@graph_bp.route('/api/graphs/<graph_id>', methods=['DELETE'])
 def delete_graph(graph_id):
     if graph_manager.delete_graph(graph_id):
         return jsonify({'message': 'Graph deleted successfully'}), 200
     return jsonify({'error': 'Graph not found'}), 404
 
 # Update a graph name
-@app.route('/api/graphs/<graph_id>', methods=['PUT'])
+@graph_bp.route('/api/graphs/<graph_id>', methods=['PUT'])
 def update_graph(graph_id):
     data = request.get_json()
     name = data.get('name')

@@ -1,12 +1,15 @@
-from flask import jsonify, request
-from backend.models.search import WhooshSearchEngine
+from flask import Blueprint, request, jsonify
+from models.search import WhooshSearchEngine
+
+# Create a Blueprint instead of using @app
+search_bp = Blueprint('search_bp', __name__)
 
 # Initialize search engine
 search_engine = WhooshSearchEngine(path="search_index")
 
 # Routes for full-text search
 # Search entities
-@app.route('/api/search', methods=['POST'])
+@search_bp.route('/api/search', methods=['POST'])
 def search_entities():
     data = request.get_json()
     query = data.get('query')
@@ -21,7 +24,7 @@ def search_entities():
     return jsonify(results), 200
 
 # Get search results by ID
-@app.route('/api/search/<search_id>', methods=['GET'])
+@search_bp.route('/api/search/<search_id>', methods=['GET'])
 def get_search_result(search_id):
     # This is a simplified implementation - in a real application,
     # you would retrieve the search result by ID from a persistent storage

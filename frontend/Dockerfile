@@ -2,6 +2,7 @@
 FROM node:25-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json* ./
+RUN npm install
 RUN npm ci --only=production
 COPY . .
 RUN npm run build --output-path=dist/frontend

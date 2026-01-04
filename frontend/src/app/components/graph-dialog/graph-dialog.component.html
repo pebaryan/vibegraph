@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>{{data.mode === 'create' ? 'Create Graph' : 'Rename Graph'}}</h2>
+<form [formGroup]="nameForm" (ngSubmit)="onSave()">
+  <mat-form-field appearance="fill" style="width: 100%;">
+    <mat-label>Graph Name</mat-label>
+    <input matInput formControlName="name" required />
+    <mat-error *ngIf="nameForm.get('name')?.hasError('required')">Name is required</mat-error>
+  </mat-form-field>
+
+  <div mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="onCancel()">Cancel</button>
+    <button mat-button color="primary" type="submit" [disabled]="nameForm.invalid">Save</button>
+  </div>
+</form>

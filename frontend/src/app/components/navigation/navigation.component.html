@@ -1,5 +1,6 @@
-<div>
+<div class="graph-nav-container">
   <h2>Results Table</h2>
+  <h4></h4>
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" *ngIf="displayedColumns.length > 0">
     <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
       <th mat-header-cell *matHeaderCellDef> {{column}} </th>

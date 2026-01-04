@@ -23,3 +23,6 @@ venv/
 build/
 dist/
 *.egg-info/
+
+graphs_data
+graph_data.json

@@ -14,7 +14,8 @@ export interface Graph {
   providedIn: 'root',
 })
 export class GraphService {
-  private readonly baseUrl = '/api/graphs';
+  private readonly apiHost = '//localhost:5000'
+  private readonly baseUrl = this.apiHost + '/api/graphs';
 
   constructor(private http: HttpClient) {}
 

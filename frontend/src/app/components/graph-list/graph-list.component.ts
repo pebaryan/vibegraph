@@ -19,7 +19,7 @@ export class GraphListComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadGraphs();
@@ -79,6 +79,10 @@ export class GraphListComponent implements OnInit {
       },
       error: (err) => this.showError(err)
     });
+  }
+
+  examineGraph(graph: Graph): void {
+    this.router.navigate(['/nav'], { queryParams: { id: graph.graph_id } });
   }
 
   viewGraph(graph: Graph): void {

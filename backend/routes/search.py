@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify
 from models.search import WhooshSearchEngine
 
-# Create a Blueprint instead of using @app
 search_bp = Blueprint('search_bp', __name__)
 
 # Initialize search engine
 search_engine = WhooshSearchEngine(path="search_index")
 
 # Routes for full-text search
+
 # Search entities
 @search_bp.route('/api/search', methods=['POST'])
 def search_entities():

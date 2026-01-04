@@ -1,10 +1,10 @@
-<div>
+<div class="graph-view-container">
   <h2>Graph View</h2>
-  <svg id="graphSvg" width="800" height="600" style="border:1px solid #ccc;"></svg>
+  <svg id="graphSvg" width="100%" height="600" style="border:1px solid #ccc;"></svg>
   <div class="add-triple-form">
     <input [(ngModel)]="newSubject" placeholder="Subject" />
     <input [(ngModel)]="newPredicate" placeholder="Predicate" />
     <input [(ngModel)]="newObject" placeholder="Object" />
-    <button (click)="addTriple()">Add Triple</button>
+    <button mat-btn (click)="addTriple()">Add Triple</button>
   </div>
 </div>

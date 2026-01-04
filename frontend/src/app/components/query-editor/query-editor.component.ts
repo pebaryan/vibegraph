@@ -9,16 +9,15 @@ import { AfterViewInit } from '@angular/core';
   styleUrls: ['./query-editor.component.scss']
 })
 export class QueryEditorComponent implements AfterViewInit {
-  query: string = '';
+  query: string = 'SELECT * WHERE { ?s ?p ?o. }';
   loading = false;
   error: string | null = null;
   public editorOptions = {
     theme: 'vs-light',
-    language: 'sparql',
-    automaticLayout: true
+    language: 'sparql'
   };
 
-  constructor(private queryService: QueryService, public state: AppState) {}
+  constructor(private queryService: QueryService, public state: AppState) { }
 
   ngAfterViewInit() {
     // Register SPARQL language if not already registered
@@ -30,16 +29,18 @@ export class QueryEditorComponent implements AfterViewInit {
   execute() {
     this.loading = true;
     this.error = null;
-    this.queryService.execute(this.query).subscribe(
-      res => {
-        this.loading = false;
-        this.state.setLastResult(res);
-        this.state.addToHistory(this.query);
-      },
-      err => {
-        this.loading = false;
-        this.error = err?.message || 'Execution failed';
-      }
+    this.queryService.execute(this.query).subscribe({
+      next:
+        res => {
+          this.loading = false;
+          this.state.setLastResult(res);
+          this.state.addToHistory(this.query);
+        }, error:
+        err => {
+          this.loading = false;
+          this.error = err?.message || 'Execution failed';
+        }
+    }
     );
   }
 }

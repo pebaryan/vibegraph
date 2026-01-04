@@ -13,3 +13,7 @@ table {
   width: 100%;
   margin-top: 48px;
 }
+
+::ng-deep .mat-header-cell {
+  font-weight: bold; 
+}

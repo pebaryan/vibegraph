@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-@Injectable({providedIn:'root'})
+@Injectable({ providedIn: 'root' })
 export class AppState {
   private historySubject = new BehaviorSubject<string[]>([]);
   history$ = this.historySubject.asObservable();
+  
   private resultSubject = new BehaviorSubject<any>(null);
   result$ = this.resultSubject.asObservable();
 

@@ -5,10 +5,10 @@ from models.query import SPARQLQueryProcessor
 # Initialize SPARQL query processor
 sparql_processor = SPARQLQueryProcessor()
 
-# Create a Blueprint instead of using @app
 query_bp = Blueprint('query_bp', __name__)
 
 # Routes for SPARQL query interface
+
 # Execute a SPARQL query
 @query_bp.route('/api/queries', methods=['POST'])
 def execute_query():

@@ -1,4 +1,4 @@
 <div>
   <h3>Query Results</h3>
-  <pre>{{ state.lastResult | json }}</pre>
+  <pre *ngIf="state.lastResult != null">{{ state.lastResult | json }}</pre>
 </div>

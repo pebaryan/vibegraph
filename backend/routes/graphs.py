@@ -5,10 +5,10 @@ from routes.search import search_engine
 # Initialize graph manager
 graph_manager = GraphManager()
 
-# Create a Blueprint instead of using @app
 graph_bp = Blueprint('graph_bp', __name__)
 
 # Routes for graph management
+
 # Create a new graph
 @graph_bp.route('/api/graphs', methods=['POST'])
 def create_graph():
@@ -21,7 +21,7 @@ def create_graph():
     return jsonify(result), 201
 
 # List all graphs
-
+@graph_bp.route('/api/graphs', methods=['GET'])
 def list_graphs():
     graphs = graph_manager.list_graphs()
     return jsonify({'graphs': graphs})
@@ -55,10 +55,6 @@ def upload_graph(graph_id):
         return jsonify({'message': 'Graph uploaded'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-
-def list_graphs():
-    graphs = graph_manager.list_graphs()
-    return jsonify({'graphs': graphs})
 
 # Get a specific graph by ID
 @graph_bp.route('/api/graphs/<graph_id>', methods=['GET'])

@@ -1,0 +1,132 @@
+openapi: 3.0.0
+info:
+  title: GraphDB Web UI Clone API
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+paths:
+  /api/graphs:
+    post:
+      summary: Create a new graph
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Created
+    get:
+      summary: List all graphs
+      responses:
+        '200':
+          description: OK
+  /api/graphs/{graph_id}:
+    get:
+      summary: Get graph metadata
+      parameters:
+        - in: path
+          name: graph_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      summary: Update graph name
+      parameters:
+        - in: path
+          name: graph_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Updated
+    delete:
+      summary: Delete a graph
+      parameters:
+        - in: path
+          name: graph_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+  /api/graphs/{graph_id}/upload:
+    post:
+      summary: Upload RDF file to graph
+      parameters:
+        - in: path
+          name: graph_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Uploaded
+  /api/queries:
+    post:
+      summary: Execute SPARQL query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                graph_id:
+                  type: string
+      responses:
+        '200':
+          description: Query result
+  /api/queries/history:
+    get:
+      summary: Get query history
+      responses:
+        '200':
+          description: History
+  /api/search:
+    post:
+      summary: Search entities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                search_by:
+                  type: string
+      responses:
+        '200':
+          description: Search results

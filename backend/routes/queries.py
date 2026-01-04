@@ -1,4 +1,6 @@
 from flask import jsonify, request
+from backend.app import app
+from backend.routes.graphs import graph_manager
 from backend.models.query import SPARQLQueryProcessor
 
 # Initialize SPARQL query processor
@@ -14,17 +16,28 @@ def execute_query():
 
     if not query:
         return jsonify({'error': 'Query is required'}), 400
-
     if not graph_id:
         return jsonify({'error': 'Graph ID is required'}), 400
 
-    # Execute the query
-    result = sparql_processor.execute_query(query, graph_id)
+    # Retrieve the Graph instance
+    graph_obj = graph_manager.get_graph_object(graph_id)
+    if not graph_obj:
+        return jsonify({'error': 'Graph not found'}), 404
 
-    # Format the results for display
-    formatted_result = sparql_processor.format_results(result)
-
-    return jsonify(formatted_result), 200
+    try:
+        # Execute the query against the RDF graph
+        qres = graph_obj.graph.query(query)
+        results = []
+        for row in qres:
+            # Convert each row to a dict of variable name -> value
+            results.append({str(var): str(row[var]) for var in qres.vars})
+        response = {
+            'results': results,
+            'count': len(results)
+        }
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 # Get query history
 @app.route('/api/queries/history', methods=['GET'])

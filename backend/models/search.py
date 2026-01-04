@@ -1,9 +1,10 @@
-from whoosh.index import create_in, Index
-from whoosh.fields import ID, TEXT, STORED
+from whoosh.index import create_in, open_dir
+from whoosh.fields import ID, TEXT, STORED, Schema
 from whoosh.qparser import QueryParser
 from whoosh.analysis import StandardTokenizer
 import os
 import json
+import uuid
 
 # Whoosh Search Model
 
@@ -19,38 +20,25 @@ class WhooshSearchEngine:
             os.makedirs(self.path)
 
         # Define the schema for the index
-        schema = [
-            ID("id", stored=True),
-            TEXT("iri", stored=True),
-            TEXT("label", stored=True),
-            TEXT("properties", stored=True)
-        ]
+        schema = Schema(
+            id=ID(stored=True),
+            iri=TEXT(stored=True),
+            label=TEXT(stored=True),
+            properties=TEXT(stored=True)
+        )
 
         # Create the index
         self.index = create_in(self.path, schema)
 
     def add_entity(self, entity):
         """Add an entity to the search index"""
-        # In a real application, you would parse the RDF data to extract entities
-        # and their properties
-
-        # For demonstration purposes, we'll just add a mock entity
-        mock_entity = {
-            'iri': 'http://example.org/entity1',
-            'label': 'Entity 1',
-            'properties': [
-                {'predicate': 'http://example.org/predicate1', 'object': 'http://example.org/object1'},
-                {'predicate': 'http://example.org/predicate2', 'object': 'http://example.org/object2'}
-            ]
-        }
-
-        # Add the entity to the index
+        # entity is expected to be a dict with keys: iri, label, properties (list of dicts)
         writer = self.index.writer()
         writer.add_document(
             id=str(uuid.uuid4()),
-            iri=mock_entity['iri'],
-            label=mock_entity['label'],
-            properties=json.dumps(mock_entity['properties'])
+            iri=entity.get('iri', ''),
+            label=entity.get('label', ''),
+            properties=json.dumps(entity.get('properties', []))
         )
         writer.commit()
 

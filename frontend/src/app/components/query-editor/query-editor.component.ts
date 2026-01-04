@@ -7,12 +7,27 @@ import { AppState } from '@app/state/app.state';
   templateUrl: './query-editor.component.html',
   styleUrls: ['./query-editor.component.css']
 })
-export class QueryEditorComponent {
+import { AfterViewInit } from '@angular/core';
+import * as monaco from 'monaco-editor';
+
+export class QueryEditorComponent implements AfterViewInit {
   query: string = '';
   loading = false;
   error: string | null = null;
+  public editorOptions = {
+    theme: 'vs-light',
+    language: 'sparql',
+    automaticLayout: true
+  };
 
   constructor(private queryService: QueryService, public state: AppState) {}
+
+  ngAfterViewInit() {
+    // Register SPARQL language if not already registered
+    if (!monaco.languages.getLanguages().some(l => l.id === 'sparql')) {
+      monaco.languages.register({ id: 'sparql' });
+    }
+  }
 
   execute() {
     this.loading = true;

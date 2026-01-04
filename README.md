@@ -1,6 +1,41 @@
 # GraphDB Web UI Clone for RDFLib
 
-This project implements a lightweight backend for interacting with RDF data using RDFLib and Whoosh for full‑text search.
+This repository contains a lightweight backend built with Flask and a frontend Angular application that lets users query and visualize RDF data.
+
+## Local Setup
+
+### Backend
+
+```bash
+# From the project root
+pip install -r backend/requirements.txt
+```
+
+### Frontend
+
+```bash
+# From the frontend directory
+cd frontend
+npm install
+```
+
+## Docker Setup
+
+Run the following command from the project root:
+
+```bash
+docker compose up --build
+```
+
+This will build the backend and frontend images, expose the backend on port **5000** and the frontend on port **4200**.
+
+Once both containers are up, you can access:
+
+- **Frontend**: <http://localhost:4200>
+- **Backend API**: <http://localhost:5000>
+- **Swagger UI**: <http://localhost:5000/apidocs>
+
+---
 
 ## Endpoints
 
@@ -15,6 +50,8 @@ This project implements a lightweight backend for interacting with RDF data usin
 | POST | `/api/queries` | Execute a SPARQL query. Request body: `{"query": "SELECT …", "graph_id": "<id>"}` |
 | GET | `/api/queries/history` | Get mock query history |
 | GET | `/api/search` | Search entities. Request body: `{"query": "search text", "search_by": "label"}` |
+
+---
 
 ## Example cURL commands
 

@@ -16,6 +16,7 @@ export class GraphViewComponent implements OnInit {
   newPredicate = '';
   newObject = '';
 
+  graphId: string = 'default';
   constructor(private graphService: GraphService, private route: ActivatedRoute) {}
 
   ngOnInit() {
@@ -23,8 +24,7 @@ export class GraphViewComponent implements OnInit {
   }
 
   fetchTriples() {
-    // For simplicity, use the first graph id; in real app, pass id from route
-    const graphId = 'default';
+    const graphId = this.route.snapshot.queryParams['id'] || this.graphId;
     this.graphService.getTriples(graphId).subscribe((data) => {
       this.triples = data;
       this.processTriples();

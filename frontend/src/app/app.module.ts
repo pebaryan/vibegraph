@@ -23,10 +23,11 @@ import { QueryHistoryComponent } from '@app/components/query-history/query-histo
 import { QueryResultsComponent } from '@app/components/query-results/query-results.component';
 import { GraphListComponent } from '@app/components/graph-list/graph-list.component';
 import { GraphDialogComponent } from '@app/components/graph-dialog/graph-dialog.component';
+import { LandingHomeComponent } from '@app/components/landing-home/landing-home.component';
 import { SearchComponent } from '@app/components/search/search.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'query', pathMatch: 'full' },
+  { path: '', component: LandingHomeComponent },
   { path: 'query', component: QueryEditorComponent },
   { path: 'graph', component: GraphViewComponent },
   { path: 'graphs', component: GraphListComponent },
@@ -45,6 +46,7 @@ const routes: Routes = [
     QueryResultsComponent,
     GraphListComponent,
     GraphDialogComponent,
+    LandingHomeComponent,
     SearchComponent
   ],
   imports: [

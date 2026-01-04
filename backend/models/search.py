@@ -15,9 +15,17 @@ class WhooshSearchEngine:
         self.create_index()
 
     def create_index(self):
-        """Create or open the Whoosh index"""
+        """Create or open the Whoosh index and ensure it is persisted."""
         if not os.path.exists(self.path):
             os.makedirs(self.path)
+
+        # If the index directory already contains an index, open it
+        if os.listdir(self.path):
+            try:
+                self.index = open_dir(self.path)
+                return
+            except Exception:
+                pass
 
         # Define the schema for the index
         schema = Schema(
@@ -27,7 +35,7 @@ class WhooshSearchEngine:
             properties=TEXT(stored=True)
         )
 
-        # Create the index
+        # Create the index on disk
         self.index = create_in(self.path, schema)
 
     def add_entity(self, entity):

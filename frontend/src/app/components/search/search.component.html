@@ -1,0 +1,21 @@
+<div class="search-container">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Search</mat-label>
+    <input matInput [formControl]="queryCtrl" placeholder="Type a query" />
+  </mat-form-field>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="30"></mat-spinner>
+  </div>
+
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <mat-list *ngIf="results.length > 0">
+    <mat-list-item *ngFor="let r of results">
+      <pre>{{ r | json }}</pre>
+    </mat-list-item>
+  </mat-list>
+  <div *ngIf="!loading && results.length === 0 && queryCtrl.value" class="no-results">
+    No results found.
+  </div>
+</div>

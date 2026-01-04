@@ -1,0 +1,19 @@
+.search-container {
+  padding: 1rem;
+}
+.search-field {
+  width: 100%;
+}
+.loading {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.error {
+  color: red;
+  margin-top: 0.5rem;
+}
+.no-results {
+  margin-top: 1rem;
+  font-style: italic;
+}

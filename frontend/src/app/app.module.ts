@@ -23,12 +23,14 @@ import { QueryHistoryComponent } from '@app/components/query-history/query-histo
 import { QueryResultsComponent } from '@app/components/query-results/query-results.component';
 import { GraphListComponent } from '@app/components/graph-list/graph-list.component';
 import { GraphDialogComponent } from '@app/components/graph-dialog/graph-dialog.component';
+import { SearchComponent } from '@app/components/search/search.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'query', pathMatch: 'full' },
   { path: 'query', component: QueryEditorComponent },
   { path: 'graph', component: GraphViewComponent },
   { path: 'graphs', component: GraphListComponent },
+  { path: 'search', component: SearchComponent },
   { path: 'nav', component: NavigationComponent },
   { path: '**', redirectTo: 'query' }
 ];
@@ -42,7 +44,8 @@ const routes: Routes = [
     QueryHistoryComponent,
     QueryResultsComponent,
     GraphListComponent,
-    GraphDialogComponent
+    GraphDialogComponent,
+    SearchComponent
   ],
   imports: [
     BrowserModule,

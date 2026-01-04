@@ -1,36 +1,38 @@
-import { Component } from '@angular/core';
-import { AppState } from '@app/state/app.state';
-
-import { OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-
+import { Component } from "@angular/core";
+import { OnInit } from "@angular/core";
+import { MatTableDataSource } from "@angular/material/table";
+import { GraphService, Triple } from "@app/services/graph.service";
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
-  selector: 'app-navigation',
-  templateUrl: './navigation.component.html',
-  styleUrls: ['./navigation.component.scss']
+  selector: "app-navigation",
+  templateUrl: "./navigation.component.html",
+  styleUrls: ["./navigation.component.scss"],
 })
 export class NavigationComponent implements OnInit {
   selectedEntity: any = null;
   displayedColumns: string[] = [];
-  dataSource = new MatTableDataSource<any>([]);
+  dataSource = new MatTableDataSource<Triple>([]);
 
-  constructor(public state: AppState) {}
+  graphId: string = "default";
+
+  triples: Triple[] = [];
+
+  constructor(
+    private graphService: GraphService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
-    this.state.result$.subscribe(res => {
-      if (Array.isArray(res) && res.length > 0) {
-        this.displayedColumns = Object.keys(res[0]);
-        this.dataSource.data = res;
-      } else {
-        this.displayedColumns = [];
-        this.dataSource.data = [];
-      }
+    this.graphId = this.route.snapshot.queryParams["id"] || this.graphId;
+    this.graphService.getTriples(this.graphId).subscribe((data) => {
+      this.triples = data.triples;
+      this.displayedColumns = ["subject", "predicate", "object"];
+      this.dataSource = new MatTableDataSource<Triple>(this.triples);
     });
   }
 
-  selectEntity(entity: any) {
-    this.selectedEntity = entity;
+  selectEntity(column, value, e: any) {
+    this.selectedEntity = { type: column, entity: value, e: e };
   }
 }
-

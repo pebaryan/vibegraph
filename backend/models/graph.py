@@ -3,6 +3,8 @@ import uuid
 import os
 import json
 from rdflib import Graph as RDFGraph
+from rdflib import URIRef, Literal, BNode, Namespace
+from rdflib import RDF, RDFS, OWL
 
 # Graph Management Model
 
@@ -29,6 +31,41 @@ class Graph:
             os.makedirs(directory, exist_ok=True)
         file_path = os.path.join(directory, f"{self.graph_id}.ttl")
         self.graph.serialize(file_path, format='turtle')
+
+    def add_triple(self, triple):
+        self.graph.add((self.wrap(triple[0], 's'), self.wrap(triple[1]), self.wrap(triple[2], 'o')))
+
+    def wrap(self, value: str, pos='p'):
+        defaultNs = Namespace('http://vibe.graph/default/')
+        prefixes = {'rdf': RDF, 'rdfs': RDFS, 'owl': OWL}
+        if pos in ('s', 'o'):
+            if value.startswith('_:'):
+                return BNode(value[2:])
+            elif '://' in value:
+                return URIRef(value)
+            elif ':' in value:
+                ci = value.index(':')
+                prefix = value[:ci]
+                postfix = value[ci+1:]
+                if prefix in prefixes:
+                    return prefixes[prefix][postfix]
+                return defaultNs[postfix]
+            else:
+                return Literal(value)
+        else:
+            if value == 'a':
+                return RDF.type
+            elif '://' in value:
+                return URIRef(value)
+            elif ':' in value:
+                ci = value.index(':')
+                prefix = value[:ci]
+                postfix = value[ci+1:]
+                if prefix in prefixes:
+                    return prefixes[prefix][postfix]
+                return defaultNs[postfix]
+            else:
+                return defaultNs[value]
 
     @staticmethod
     def load_from_file(file_path, graph_id, name, created_at):
@@ -109,6 +146,13 @@ class GraphManager:
             self._save()
             return True
         return False
+    
+    def add_triple(self, graph_id, triple):
+        if graph_id in self.graphs:
+            g = self.get_graph_object(graph_id).add_triple(triple)
+            self._save()
+            return True
+        return False
 
     def update_graph(self, graph_id, name=None):
         """Update the name of an existing graph"""
@@ -126,6 +170,8 @@ class GraphManager:
         graph_obj = self.get_graph_object(graph_id)
         if not graph_obj:
             raise ValueError(f"Graph {graph_id} not found")
+        for s, p, o in graph_obj.graph:
+            print(s, p, o)
         return [{'subject': str(s), 'predicate': str(p), 'object': str(o)} for s, p, o in graph_obj.graph]
 
 # Each graph's RDF data is stored in "graphs_data/<graph_id>.ttl"

@@ -10,6 +10,16 @@ export interface Graph {
   data?: any;
 }
 
+export interface Triple {
+  subject: string;
+  predicate: string;
+  object: string;
+}
+
+export interface TripleResult {
+  triples: Triple[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -26,13 +36,13 @@ export class GraphService {
     );
   }
 
-  getTriples(graphId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/${graphId}/triples`).pipe(
+  getTriples(graphId: string): Observable<TripleResult> {
+    return this.http.get<TripleResult>(`${this.baseUrl}/${graphId}/triples`).pipe(
       catchError(this.handleError)
     );
   }
 
-  createTriple(graphId: string, triple: any): Observable<any> {
+  createTriple(graphId: string, triple: Triple): Observable<any> {
     return this.http.post(`${this.baseUrl}/${graphId}/triples`, triple).pipe(
       catchError(this.handleError)
     );

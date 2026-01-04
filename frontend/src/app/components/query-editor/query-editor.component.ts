@@ -1,23 +1,27 @@
-import { Component } from '@angular/core';
-import { QueryService } from '@app/services/query.service';
-import { AppState } from '@app/state/app.state';
-import { AfterViewInit } from '@angular/core';
+import { Component } from "@angular/core";
+import { QueryService } from "@app/services/query.service";
+import { AppState } from "@app/state/app.state";
+import { AfterViewInit } from "@angular/core";
 
 @Component({
-  selector: 'app-query-editor',
-  templateUrl: './query-editor.component.html',
-  styleUrls: ['./query-editor.component.scss']
+  selector: "app-query-editor",
+  templateUrl: "./query-editor.component.html",
+  styleUrls: ["./query-editor.component.scss"],
 })
 export class QueryEditorComponent implements AfterViewInit {
-  query: string = 'SELECT * WHERE { ?s ?p ?o. }';
+  query: string = "SELECT * WHERE { ?s ?p ?o. }";
   loading = false;
   error: string | null = null;
   public editorOptions = {
-    theme: 'vs-light',
-    language: 'sparql'
+    theme: "vs-light",
+    language: "sparql",
+    scrollBeyondLastLine: false, // Prevents extra empty space at the bottom
+    scrollbar: {
+      alwaysConsumeMouseWheel: false, // This is the key setting!
+    },
   };
 
-  constructor(private queryService: QueryService, public state: AppState) { }
+  constructor(private queryService: QueryService, public state: AppState) {}
 
   ngAfterViewInit() {
     // Register SPARQL language if not already registered
@@ -30,17 +34,15 @@ export class QueryEditorComponent implements AfterViewInit {
     this.loading = true;
     this.error = null;
     this.queryService.execute(this.query).subscribe({
-      next:
-        res => {
-          this.loading = false;
-          this.state.setLastResult(res);
-          this.state.addToHistory(this.query);
-        }, error:
-        err => {
-          this.loading = false;
-          this.error = err?.message || 'Execution failed';
-        }
-    }
-    );
+      next: (res) => {
+        this.loading = false;
+        this.state.setLastResult(res);
+        this.state.addToHistory(this.query);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = err?.error || "Execution failed";
+      },
+    });
   }
 }

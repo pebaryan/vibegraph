@@ -17,6 +17,9 @@ export class NavigationComponent implements OnInit {
   graphId: string = "default";
 
   triples: Triple[] = [];
+  newSubject = "";
+  newPredicate = "";
+  newObject = "";
 
   constructor(
     private graphService: GraphService,
@@ -24,6 +27,10 @@ export class NavigationComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.fetchTriples();
+  }
+
+  fetchTriples() {
     this.graphId = this.route.snapshot.queryParams["id"] || this.graphId;
     this.graphService.getTriples(this.graphId).subscribe((data) => {
       this.triples = data.triples;
@@ -33,6 +40,20 @@ export class NavigationComponent implements OnInit {
   }
 
   selectEntity(column, value, e: any) {
-    this.selectedEntity = { type: column, entity: value, e: e };
+    this.selectedEntity = { type: column, entity: value };
+  }
+
+  addTriple() {
+    const triple = {
+      subject: this.newSubject,
+      predicate: this.newPredicate,
+      object: this.newObject,
+    };
+    this.graphService.createTriple(this.graphId, triple).subscribe(() => {
+      this.fetchTriples();
+      this.newSubject = "";
+      this.newPredicate = "";
+      this.newObject = "";
+    });
   }
 }

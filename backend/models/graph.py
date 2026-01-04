@@ -170,8 +170,8 @@ class GraphManager:
         graph_obj = self.get_graph_object(graph_id)
         if not graph_obj:
             raise ValueError(f"Graph {graph_id} not found")
-        for s, p, o in graph_obj.graph:
-            print(s, p, o)
+        # for s, p, o in graph_obj.graph:
+        #     print(s, p, o)
         return [{'subject': str(s), 'predicate': str(p), 'object': str(o)} for s, p, o in graph_obj.graph]
 
 # Each graph's RDF data is stored in "graphs_data/<graph_id>.ttl"

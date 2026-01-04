@@ -1,0 +1,8 @@
+<div>
+  <h3>Query History</h3>
+  <ul>
+    <li *ngFor="let q of state.history" (click)="state.addToHistory(q)" style="cursor:pointer">
+      {{q}}
+    </li>
+  </ul>
+</div>

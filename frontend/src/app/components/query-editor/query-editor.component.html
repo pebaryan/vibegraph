@@ -1,0 +1,17 @@
+<div>
+  <h2>SPARQL Query Editor</h2>
+  <textarea [(ngModel)]="query" rows="10" cols="80" placeholder="Enter SPARQL query"></textarea>
+  <br>
+  <button (click)="execute()" [disabled]="loading || !query">Execute</button>
+  <span *ngIf="loading">Running...</span>
+  <div *ngIf="error" style="color:red">{{error}}</div>
+</div>
+<div>
+  <h3>Query History</h3>
+  <ul>
+    <li *ngFor="let q of state.history" (click)="query = q; execute()" style="cursor:pointer">
+      {{q}}
+    </li>
+  </ul>
+</div>
+<app-query-results></app-query-results>

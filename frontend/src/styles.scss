@@ -1,4 +1,8 @@
 /* Global styles */
+.spacer {
+  flex: 1 1 auto;
+}
+
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
 body {

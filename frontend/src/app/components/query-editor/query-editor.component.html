@@ -2,7 +2,7 @@
   <h2>SPARQL Query Editor</h2>
   <ngx-monaco-editor [options]="editorOptions" [(ngModel)]="query" style="width:100%;height:300px;"></ngx-monaco-editor>
   <br>
-  <button (click)="execute()" [disabled]="loading || !query">Execute</button>
+  <button mat-button (click)="execute()" [disabled]="loading || !query">Execute</button>
   <span *ngIf="loading">Running...</span>
   <div *ngIf="error" style="color:red">{{error}}</div>
 </div>

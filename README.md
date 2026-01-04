@@ -1,4 +1,4 @@
-# GraphDB Web UI Clone for RDFLib
+# VibeGraph Web UI Clone for RDFLib
 
 This repository contains a lightweight backend built with Flask and a frontend Angular application that lets users query and visualize RDF data.
 

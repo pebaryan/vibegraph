@@ -1,4 +1,4 @@
-# Project Brief: GraphDB Web UI Clone for RDFLib
+# Project Brief: VibeGraph Web UI Clone for RDFLib
 
 ## Project Overview
 This project aims to create a web-based user interface (UI) for interacting with RDF (Resource Description Framework) data stored in local files using the Python RDFLib library. The interface will function as a lightweight alternative to existing GraphDB solutions, focusing on core functionality for RDF data management, querying, visualization, and search.

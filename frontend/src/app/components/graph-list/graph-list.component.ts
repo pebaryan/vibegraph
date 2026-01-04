@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { GraphService, Graph } from '@app/services/graph.service';
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-graph-list',
@@ -16,7 +17,8 @@ export class GraphListComponent implements OnInit {
   constructor(
     private graphService: GraphService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -77,6 +79,10 @@ export class GraphListComponent implements OnInit {
       },
       error: (err) => this.showError(err)
     });
+  }
+
+  viewGraph(graph: Graph): void {
+    this.router.navigate(['/graph'], { queryParams: { id: graph.graph_id } });
   }
 
   private showMessage(msg: string): void {

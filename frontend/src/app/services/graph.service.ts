@@ -25,6 +25,18 @@ export class GraphService {
     );
   }
 
+  getTriples(graphId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/${graphId}/triples`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  createTriple(graphId: string, triple: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${graphId}/triples`, triple).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   createGraph(name: string): Observable<Graph> {
     return this.http.post<Graph>(this.baseUrl, { name }).pipe(
       catchError(this.handleError)

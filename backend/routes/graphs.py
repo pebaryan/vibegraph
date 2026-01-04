@@ -21,6 +21,19 @@ def create_graph():
     return jsonify(result), 201
 
 # List all graphs
+
+def list_graphs():
+    graphs = graph_manager.list_graphs()
+    return jsonify({'graphs': graphs})
+
+# Get triples for a graph
+@graph_bp.route('/api/graphs/<graph_id>/triples', methods=['GET'])
+def get_triples(graph_id):
+    try:
+        triples = graph_manager.get_triples(graph_id)
+        return jsonify({'triples': triples})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 @graph_bp.route('/api/graphs', methods=['GET'])
 
 # Upload RDF file for a graph

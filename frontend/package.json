@@ -21,7 +21,8 @@
     "monaco-editor": "^0.55.1",
     "ngx-monaco-editor-v2": "^18.0.0",
     "rxjs": "^7.8.0",
-    "zone.js": "~0.14.0"
+    "zone.js": "~0.14.0",
+    "d3": "^7.8.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.2.0",

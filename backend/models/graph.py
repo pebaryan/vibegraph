@@ -120,4 +120,12 @@ class GraphManager:
         return False
 
     # Persist RDF graph data in Turtle format per graph
+
+    def get_triples(self, graph_id):
+        """Retrieve all triples from the RDF graph"""
+        graph_obj = self.get_graph_object(graph_id)
+        if not graph_obj:
+            raise ValueError(f"Graph {graph_id} not found")
+        return [{'subject': str(s), 'predicate': str(p), 'object': str(o)} for s, p, o in graph_obj.graph]
+
 # Each graph's RDF data is stored in "graphs_data/<graph_id>.ttl"

@@ -4,6 +4,7 @@ from flasgger import Swagger
 from routes.search import search_bp
 from routes.queries import query_bp
 from routes.graphs import graph_bp
+
 # Initialize Flask application
 app = Flask(__name__)
 
@@ -18,36 +19,46 @@ swagger_template = {
     "info": {
         "title": "GraphDB Web UI Clone API",
         "version": "1.0.0",
-    }
+    },
 }
 
 swagger_config = {
     "headers": [],
     "specs": [
         {
-            "endpoint": 'apispec_1',
-            "route": '/apispec_1.json',
+            "endpoint": "apispec_1",
+            "route": "/apispec_1.json",
             "rule_filter": lambda rule: True,
             "model_filter": lambda tag: True,
         }
     ],
     "static_url_path": "/flasgger_static",
     "swagger_ui": True,
-    "specs_route": "/apidocs/"
+    "specs_route": "/apidocs/",
 }
 
-app.config['SWAGGER'] = {
-    'title': 'GraphDB Web UI Clone API',
-    'uiversion': 3,
-    'openapi': '3.0.0'
+app.config["SWAGGER"] = {
+    "title": "GraphDB Web UI Clone API",
+    "uiversion": 3,
+    "openapi": "3.0.0",
 }
 
-swagger = Swagger(app, 
-                 config=swagger_config, 
-                 template=swagger_template, 
-                 template_file='swagger.yaml')
+swagger = Swagger(
+    app, config=swagger_config, template=swagger_template, template_file="swagger.yaml"
+)
 
-CORS(app)  # Enable CORS for all routes
-
+CORS(
+    app,
+    resources={
+        r"/*": {
+            "origins": [
+                "http://localhost",
+                "http://localhost:4200",  # React default dev port
+                "http://127.0.0.1",
+                "http://127.0.0.1:5000",  # Flask default port
+            ]
+        }
+    },
+)
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(host="0.0.0.0", debug=True)

@@ -36,18 +36,21 @@ def execute_query():
         # Execute the query against the RDF graph
         qres = graph_obj.graph.query(query)
         results = []
-        
+        print("query: ", query)
+        print("result: ", qres, qres.vars)
+        vars = vars = qres.vars if qres.vars else []
         for row in qres:
             # Convert each row to a dict of variable name -> value
             if not qres.vars:
                 vars = ['s', 'p', 'o']
                 results.append({str(var): str(row[idx]) for idx,var in zip(range(3),'spo')})
             else:
-                vars = qres.vars
                 results.append({str(var): str(row[var]) for var in qres.vars})
         response = {"results": results, "count": len(results), "vars": vars}
         return jsonify(response), 200
     except Exception as e:
+        print(e)
+        e.printStackTrace()
         return jsonify({"error": str(e)}), 400
 
 

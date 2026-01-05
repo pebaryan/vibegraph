@@ -1,4 +1,26 @@
 <div>
   <h3>Query Results</h3>
-  <pre *ngIf="state.lastResult != null">{{ state.lastResult | json }}</pre>
+  <table
+    mat-table
+    [dataSource]="dataSource"
+    class="mat-elevation-z8"
+    *ngIf="displayedColumns.length > 0"
+  >
+    <ng-container
+      *ngFor="let column of displayedColumns"
+      [matColumnDef]="column"
+    >
+      <th mat-header-cell *matHeaderCellDef>{{ column }}</th>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        (click)="selectEntity(column, element[column], $event)"
+      >
+        {{ element[column] }}
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+  <p *ngIf="!displayedColumns.length">No results to display.</p>
 </div>

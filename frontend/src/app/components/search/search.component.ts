@@ -13,6 +13,7 @@ export class SearchComponent implements OnInit {
   results: any[] = [];
   loading = false;
   error: string | null = null;
+  readonly JSON=JSON
 
   constructor(private searchService: SearchService) {}
 
@@ -34,6 +35,7 @@ export class SearchComponent implements OnInit {
     this.error = null;
     return this.searchService.search(q).pipe(
       switchMap((res) => {
+        console.log(res)
         this.results = res?.results ?? [];
         this.loading = false;
         return [];

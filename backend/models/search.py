@@ -73,6 +73,7 @@ class WhooshSearchEngine:
                 ]
             }
         ]
+        mock_results = self.get_results(query, search_by)
 
         return {
             'query': query,

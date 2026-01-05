@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, jsonify, request
 from models.graph import GraphManager
 from routes.search import search_engine
@@ -66,8 +67,18 @@ def upload_graph(graph_id):
         graph_obj = graph_manager.get_graph_object(graph_id)
         if not graph_obj:
             return jsonify({"error": "Graph not found"}), 404
-        # Determine RDF format from mimetype
-        fmt = file.mimetype.split("/")[-1] if file.mimetype else "turtle"
+        # Determine RDF format from file extension
+        filename = file.filename.lower()
+        if filename.endswith('.ttl') or filename.endswith('.turtle'):
+            fmt = 'turtle'
+        elif filename.endswith('.trig'):
+            fmt = 'trig'
+        elif filename.endswith('.nt'):
+            fmt = 'nt'
+        elif filename.endswith('.rdf'):
+            fmt = 'rdfxml'
+        else:
+            fmt = 'turtle'  # default fallback
         graph_obj.graph.parse(file, format=fmt)
         # Index new triples
         for s, p, o in graph_obj.graph:

@@ -74,10 +74,14 @@ export class GraphService {
    * Upload an RDF file to an existing graph.
    * @param graphId ID of the graph.
    * @param file File object to upload.
+   * @param format RDF serialization format (e.g., 'turtle', 'trig', 'nt').
    */
-  uploadGraphFile(graphId: string, file: File): Observable<any> {
+  uploadGraphFile(graphId: string, file: File, format?: string): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
+    if (format) {
+      formData.append('format', format);
+    }
     return this.http.post(`${this.baseUrl}/${graphId}/upload`, formData).pipe(
       catchError(this.handleError)
     );

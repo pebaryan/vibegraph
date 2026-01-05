@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatOptionModule } from '@angular/material/core';
 import { MatTableModule } from '@angular/material/table';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 
@@ -66,6 +67,7 @@ const routes: Routes = [
     MatProgressSpinnerModule,
     MatListModule,
     MatRadioModule,
+    MatOptionModule,
     MatTableModule,
     MonacoEditorModule.forRoot()
   ],

@@ -9,20 +9,45 @@ from rdflib import RDF, RDFS, OWL
 # Graph Management Model
 
 class Graph:
-    def __init__(self, graph_id, name, created_at):
+    def __init__(self, graph_id, name, created_at, sparql_read=None, sparql_update=None, auth_type='None', auth_info=None):
         self.graph_id = graph_id
         self.name = name
         self.created_at = created_at
         self.data = {}
+        # Metadata for SPARQL data source
+        self.sparql_read = sparql_read
+        self.sparql_update = sparql_update
+        self.auth_type = auth_type
+        self.auth_info = auth_info
         # RDFLib graph instance for storing triples
-        self.graph = RDFGraph()
+        if sparql_read:
+            try:
+                from rdflib.plugins.stores.sparqlstore import SPARQLStore
+                store = SPARQLStore()
+                auth_kwargs = {}
+                if auth_type == 'Basic' and auth_info:
+                    auth_kwargs = {'username': auth_info.get('username'), 'password': auth_info.get('password')}
+                elif auth_type == 'JWT' and auth_info:
+                    token = auth_info.get('token')
+                    auth_kwargs = {'headers': {'Authorization': f'Bearer {token}'}}
+                store.open(sparql_read, sparql_update, **auth_kwargs)
+                self.graph = RDFGraph(store=store)
+            except Exception:
+                # Fallback to default graph if SPARQLStore fails
+                self.graph = RDFGraph()
+        else:
+            self.graph = RDFGraph()
 
     def to_dict(self):
         return {
             'graph_id': self.graph_id,
             'name': self.name,
             'created_at': self.created_at,
-            'data': self.data
+            'data': self.data,
+            'sparql_read': self.sparql_read,
+            'sparql_update': self.sparql_update,
+            'auth_type': self.auth_type,
+            'auth_info': self.auth_info
         }
 
     def serialize(self, directory):
@@ -68,9 +93,9 @@ class Graph:
                 return defaultNs[value]
 
     @staticmethod
-    def load_from_file(file_path, graph_id, name, created_at):
+    def load_from_file(file_path, graph_id, name, created_at, sparql_read=None, sparql_update=None, auth_type='None', auth_info=None):
         """Load an RDF graph from a Turtle file and return a Graph instance."""
-        graph = Graph(graph_id, name, created_at)
+        graph = Graph(graph_id, name, created_at, sparql_read, sparql_update, auth_type, auth_info)
         if os.path.exists(file_path):
             graph.graph.parse(file_path, format='turtle')
         return graph
@@ -91,7 +116,7 @@ class GraphManager:
             with open(self.data_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 for graph_id, meta in data.items():
-                    graph = Graph(graph_id, meta.get('name', ''), meta.get('created_at', ''))
+                    graph = Graph(graph_id, meta.get('name', ''), meta.get('created_at', ''), meta.get('sparql_read'), meta.get('sparql_update'), meta.get('auth_type', 'None'), meta.get('auth_info'))
                     self.graphs[graph_id] = meta
                     self.graph_objs[graph_id] = graph
         # Load RDF data files
@@ -102,7 +127,7 @@ class GraphManager:
                     gid = fname[:-4]
                     if gid in self.graph_objs:
                         file_path = os.path.join(data_dir, fname)
-                        self.graph_objs[gid] = Graph.load_from_file(file_path, gid, self.graphs[gid].get('name', ''), self.graphs[gid].get('created_at', ''))
+                        self.graph_objs[gid] = Graph.load_from_file(file_path, gid, self.graphs[gid].get('name', ''), self.graphs[gid].get('created_at', ''), self.graphs[gid].get('sparql_read'), self.graphs[gid].get('sparql_update'), self.graphs[gid].get('auth_type', 'None'), self.graphs[gid].get('auth_info'))
 
     def _save(self):
         """Persist current graph metadata and RDF data to storage."""

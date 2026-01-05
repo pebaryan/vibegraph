@@ -141,11 +141,11 @@ class GraphManager:
         for gid, graph in self.graph_objs.items():
             graph.serialize(data_dir)
 
-    def create_graph(self, name):
+    def create_graph(self, name, sparql_read=None, sparql_update=None, auth_type='None', auth_info=None):
         """Create a new graph with a unique identifier"""
         graph_id = str(uuid.uuid4())
         created_at = datetime.now().isoformat()
-        graph = Graph(graph_id, name, created_at)
+        graph = Graph(graph_id, name, created_at, sparql_read, sparql_update, auth_type, auth_info)
         self.graphs[graph_id] = graph.to_dict()
         self.graph_objs[graph_id] = graph
         self._save()

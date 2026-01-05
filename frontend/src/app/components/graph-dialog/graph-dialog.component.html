@@ -6,7 +6,50 @@
     <mat-error *ngIf="nameForm.get('name')?.hasError('required')">Name is required</mat-error>
   </mat-form-field>
 
-  <div mat-dialog-actions align="end">
+  <mat-radio-group formControlName="dataSource" aria-label="Data source type">
+    <mat-radio-button value="none">No source (create empty graph)</mat-radio-button>
+    <mat-radio-button value="file">Upload RDF file</mat-radio-button>
+    <mat-radio-button value="sparql">SPARQL endpoint</mat-radio-button>
+  </mat-radio-group>
+
+  <div *ngIf="nameForm.get('dataSource')?.value === 'file'" style="margin-top: 8px;">
+    <input type="file" (change)="onFileSelected($event)" />
+  </div>
+
+  <div *ngIf="nameForm.get('dataSource')?.value === 'sparql'" style="margin-top: 8px;">
+    <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Sparql Read URL</mat-label>
+      <input matInput formControlName="sparqlRead" />
+    </mat-form-field>
+    <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Sparql Update URL</mat-label>
+      <input matInput formControlName="sparqlUpdate" />
+    </mat-form-field>
+    <mat-form-field appearance="fill" style="width: 100%;">
+      <mat-label>Auth Type</mat-label>
+      <mat-select formControlName="authType">
+        <mat-option value="None">None</mat-option>
+        <mat-option value="Basic">Basic</mat-option>
+        <mat-option value="JWT">JWT</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <div *ngIf="nameForm.get('authType')?.value !== 'None'">
+      <mat-form-field appearance="fill" style="width: 100%;" *ngIf="nameForm.get('authType')?.value === 'Basic'">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" />
+      </mat-form-field>
+      <mat-form-field appearance="fill" style="width: 100%;" *ngIf="nameForm.get('authType')?.value === 'Basic'">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password" type="password" />
+      </mat-form-field>
+      <mat-form-field appearance="fill" style="width: 100%;" *ngIf="nameForm.get('authType')?.value === 'JWT'">
+        <mat-label>Token</mat-label>
+        <input matInput formControlName="token" />
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div mat-dialog-actions align="end" style="margin-top: 16px;">
     <button mat-button type="button" (click)="onCancel()">Cancel</button>
     <button mat-button color="primary" type="submit" [disabled]="nameForm.invalid">Save</button>
   </div>

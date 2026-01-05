@@ -18,7 +18,12 @@ def create_graph():
     if not name:
         return jsonify({"error": "Name is required"}), 400
 
-    result = graph_manager.create_graph(name)
+    # Optional SPARQL source parameters
+    sparql_read = data.get('sparql_read')
+    sparql_update = data.get('sparql_update')
+    auth_type = data.get('auth_type', 'None')
+    auth_info = data.get('auth_info')
+    result = graph_manager.create_graph(name, sparql_read, sparql_update, auth_type, auth_info)
     return jsonify(result), 201
 
 

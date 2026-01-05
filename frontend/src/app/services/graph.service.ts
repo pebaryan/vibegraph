@@ -48,8 +48,12 @@ export class GraphService {
     );
   }
 
-  createGraph(name: string): Observable<Graph> {
-    return this.http.post<Graph>(this.baseUrl, { name }).pipe(
+  /**
+   * Create a new graph. Accepts optional SPARQL and authentication details.
+   * @param params Object containing graph creation parameters.
+   */
+  createGraph(params: {name: string, sparql_read?: string, sparql_update?: string, auth_type?: string, auth_info?: any}): Observable<Graph> {
+    return this.http.post<Graph>(this.baseUrl, params).pipe(
       catchError(this.handleError)
     );
   }
@@ -62,6 +66,19 @@ export class GraphService {
 
   deleteGraph(id: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Upload an RDF file to an existing graph.
+   * @param graphId ID of the graph.
+   * @param file File object to upload.
+   */
+  uploadGraphFile(graphId: string, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.baseUrl}/${graphId}/upload`, formData).pipe(
       catchError(this.handleError)
     );
   }

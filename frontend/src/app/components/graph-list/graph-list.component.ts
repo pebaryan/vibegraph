@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { GraphService, Graph } from '@app/services/graph.service';
+import * as moment from 'moment';
+  moment = moment;
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
 import { Router } from '@angular/router';
 

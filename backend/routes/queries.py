@@ -62,11 +62,13 @@ def execute_query():
         history_entry = {
             "query_id": query_id,
             "query": query,
-            "graph_id": graph_id,
             "timestamp": timestamp,
             "results": results
         }
-        file_path = os.path.join(QUERY_HISTORY_DIR, f"{query_id}.json")
+        history_dir = os.path.join(QUERY_HISTORY_DIR, graph_id)
+        if not os.path.exists(history_dir):
+            os.makedirs(history_dir)
+        file_path = os.path.join(history_dir, f"{query_id}.json")
         with open(file_path, 'w') as f:
             json.dump(history_entry, f, default=str)
 
@@ -79,15 +81,16 @@ def execute_query():
         return jsonify({"error": str(e)}), 400
 
 # Get query history
-@query_bp.route("/api/queries/history", methods=["GET"])
-def get_query_history():
+@query_bp.route("/api/queries/history/<graph_id>", methods=["GET"])
+def get_query_history(graph_id):
     # Retrieve query history from persistent storage
     history = []
-    if os.path.isdir(QUERY_HISTORY_DIR):
-        for filename in os.listdir(QUERY_HISTORY_DIR):
+    history_dir = os.path.join(QUERY_HISTORY_DIR, graph_id)
+    if os.path.isdir(history_dir):
+        for filename in os.listdir(history_dir):
             if filename.endswith('.json'):
                 try:
-                    with open(os.path.join(QUERY_HISTORY_DIR, filename), 'r') as f:
+                    with open(os.path.join(history_dir, filename), 'r') as f:
                         entry = json.load(f)
                         history.append(entry)
                 except Exception:
@@ -97,10 +100,11 @@ def get_query_history():
     return jsonify({"history": history})
 
 # Get query results by ID
-@query_bp.route("/api/queries/<query_id>", methods=["GET"])
-def get_query_result(query_id):
+@query_bp.route("/api/queries/<graph_id>/<query_id>", methods=["GET"])
+def get_query_result(graph_id, query_id):
     # Retrieve the query result by ID from persistent storage
-    file_path = os.path.join(QUERY_HISTORY_DIR, f"{query_id}.json")
+    history_dir = os.path.join(QUERY_HISTORY_DIR, graph_id)
+    file_path = os.path.join(history_dir, f"{query_id}.json")
     if not os.path.isfile(file_path):
         return jsonify({"error": "Query not found"}), 404
     try:

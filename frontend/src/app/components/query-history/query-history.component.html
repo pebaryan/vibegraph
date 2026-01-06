@@ -1,8 +1,16 @@
 <div>
   <h3>Query History</h3>
+  <mat-form-field>
+    <mat-select>
+      <mat-option *ngFor="let g of graphs" (click)="loadHistory(g.graph_id)">{{
+        g.name
+      }}</mat-option>
+    </mat-select>
+    <mat-label>Selected graph</mat-label>
+  </mat-form-field>
   <ul>
-    <li *ngFor="let q of state.history" (click)="state.addToHistory(q)" style="cursor:pointer">
-      {{q}}
+    <li *ngFor="let q of queries" style="cursor: pointer">
+      {{ q | json }}
     </li>
   </ul>
 </div>

@@ -71,6 +71,14 @@ export class GraphService {
   }
 
   /**
+   * Trigger a full re‑index of all graphs.
+   * @returns Observable that completes when the server responds.
+   */
+  reindexAll(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/reindex`, {});
+  }
+
+  /**
    * Upload an RDF file to an existing graph.
    * @param graphId ID of the graph.
    * @param file File object to upload.

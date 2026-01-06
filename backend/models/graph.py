@@ -175,12 +175,24 @@ class GraphManager:
         return graph.to_dict()
     
     def index_graph(self, graph_id, search_engine):
-        self.graph[graph_id].index(search_engine)
+        self.graph_objs[graph_id].index(search_engine)
 
     def list_graphs(self):
         """List all available graphs with their metadata"""
         return [graph for graph in self.graphs.values()]
 
+    def reindex_all(self, search_engine):
+        """Re‑index every stored graph in the search engine.
+        Clears the existing index and indexes all graph entities.
+        Returns the number of graphs indexed.
+        """
+        # Reset index – easiest to create a fresh Whoosh index
+        search_engine.create_index()
+        count = 0
+        for graph_id in self.graph_objs:
+            self.graph_objs[graph_id].index(search_engine)
+            count += 1
+        return count
     def get_graph(self, graph_id):
         """Retrieve graph metadata for a specific graph ID"""
         return self.graphs.get(graph_id)

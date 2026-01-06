@@ -101,6 +101,13 @@ def get_graph(graph_id):
 def delete_graph(graph_id):
     if graph_manager.delete_graph(graph_id):
         return jsonify({"message": "Graph deleted successfully"}), 200
+
+
+# Re‑index all graphs
+@graph_bp.route("/api/graphs/reindex", methods=["POST"])
+def reindex_all_graphs():
+    count = graph_manager.reindex_all(search_engine)
+    return jsonify({"message": f"Re‑indexed {count} graphs"}), 200
     return jsonify({"error": "Graph not found"}), 404
 
 

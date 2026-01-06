@@ -54,6 +54,7 @@ const routes: Routes = [
     QueryResultsComponent,
     GraphListComponent,
     GraphDialogComponent,
+    PrefixDialogComponent,
     LandingHomeComponent,
     SearchComponent,
   ],

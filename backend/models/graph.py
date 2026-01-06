@@ -5,6 +5,25 @@ import json
 from rdflib import Graph as RDFGraph
 from rdflib import URIRef, Literal, BNode, Namespace
 from rdflib import RDF, RDFS, OWL
+# Global namespace prefixes loaded from nsprefixes.json
+import json
+import os
+PREFIXES = {"rdf": RDF, "rdfs": RDFS, "owl": OWL, "vg": Namespace("http://vibe.graph/default/")}
+
+# Function to load prefixes from file
+
+def load_global_prefixes(file_path="../nsprefixes.json"):
+    global PREFIXES
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        PREFIXES = {k: Namespace(v) for k, v in data.items()}
+    except Exception:
+        PREFIXES = {"rdf": RDF, "rdfs": RDFS, "owl": OWL, "vg": Namespace("http://vibe.graph/default/")}
+
+# Load on import
+load_global_prefixes()
+
 
 # Graph Management Model
 
@@ -78,7 +97,7 @@ class Graph:
 
     def wrap(self, value: str, pos="p"):
         defaultNs = Namespace("http://vibe.graph/default/")
-        prefixes = {"rdf": RDF, "rdfs": RDFS, "owl": OWL, "vg": defaultNs}
+        prefixes = PREFIXES
         if pos in ("s", "o"):
             if value.startswith("_:"):
                 return BNode(value[2:])

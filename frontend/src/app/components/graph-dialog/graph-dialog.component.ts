@@ -51,8 +51,9 @@ export class GraphDialogComponent {
       turtle: 'ttl',
       trig: 'trig',
       nt: 'nt',
-      rdf: 'rdfxml',
-      xml: 'rdfxml',
+      rdf: 'xml',
+      xml: 'xml',
+      owl: 'xml',
       jsonld: 'jsonld',
       json: 'jsonld',
     };
@@ -69,7 +70,7 @@ export class GraphDialogComponent {
     this.nameForm.patchValue({ guessedFormat: guessed, format: guessed });
     // expose supported formats for radio group
     this.nameForm.patchValue({
-      availableFormats: ['ttl', 'trig', 'nt', 'rdfxml', 'jsonld'],
+      availableFormats: ['ttl', 'trig', 'nt', 'xml', 'jsonld'],
     });
   }
 

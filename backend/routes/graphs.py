@@ -69,19 +69,23 @@ def upload_graph(graph_id):
             return jsonify({"error": "Graph not found"}), 404
         # Determine RDF format: use optional form field first
         filename = file.filename.lower()
-        if filename.endswith('.ttl') or filename.endswith('.turtle'):
-            fmt = 'turtle'
-        elif filename.endswith('.trig'):
-            fmt = 'trig'
-        elif filename.endswith('.nt'):
-            fmt = 'nt'
-        elif filename.endswith('.rdf'):
-            fmt = 'rdfxml'
-        else:
-            fmt = 'turtle'  # default fallback
+        fmt = request.form.get('format')
+        if not fmt:
+            if filename.endswith('.ttl') or filename.endswith('.turtle'):
+                fmt = 'turtle'
+            elif filename.endswith('.trig'):
+                fmt = 'trig'
+            elif filename.endswith('.nt'):
+                fmt = 'nt'
+            elif filename.endswith('.nt'):
+                fmt = 'nquads'
+            elif filename.endswith('.rdf') or filename.endswith('.owl') or filename.endswith('xml'):
+                fmt = 'xml'
+            else:
+                fmt = 'turtle'  # default fallback
         graph_obj.graph.parse(file, format=fmt)
         graph_manager._save()
-        graph_manager.index(graph_obj, search_engine)
+        graph_manager.index_graph(graph_obj, search_engine)
         return jsonify({"message": "Graph uploaded"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400

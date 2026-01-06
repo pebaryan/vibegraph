@@ -31,6 +31,7 @@ import { GraphDialogComponent } from '@app/components/graph-dialog/graph-dialog.
 import { LandingHomeComponent } from '@app/components/landing-home/landing-home.component';
 import { SearchComponent } from '@app/components/search/search.component';
 import { SettingsComponent } from '@app/components/settings/settings.component';
+import { PrefixDialogComponent } from "./components/prefix-dialog/prefix-dialog.component";
 
 const routes: Routes = [
   { path: '', component: LandingHomeComponent },
@@ -57,6 +58,7 @@ const routes: Routes = [
     PrefixDialogComponent,
     LandingHomeComponent,
     SearchComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,

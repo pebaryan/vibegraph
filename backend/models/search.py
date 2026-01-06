@@ -31,18 +31,20 @@ class WhooshSearchEngine:
         schema = Schema(
             iri=TEXT(stored=True),
             label=TEXT(stored=True),
+            graph_id=TEXT(stored=True)
         )
 
         # Create the index on disk
         self.index = create_in(self.path, schema)
 
-    def add_entity(self, entity):
+    def add_entity(self, entity, graph_id):
         """Add an entity to the search index"""
         # entity is expected to be a dict with keys: iri, label, properties (list of dicts)
         writer = self.index.writer()
         writer.add_document(
             iri=entity.get("iri", ""),
-            label=entity.get("label", "")
+            label=entity.get("label", ""),
+            graph_id=entity.get("graph_id", "default")
         )
         writer.commit()
 
@@ -73,6 +75,7 @@ class WhooshSearchEngine:
                     {
                         "iri": result["iri"],
                         "label": result["label"],
+                        "graph_id": result["graph_id"],
                     }
                 )
 

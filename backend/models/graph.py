@@ -5,21 +5,39 @@ import json
 from rdflib import Graph as RDFGraph
 from rdflib import URIRef, Literal, BNode, Namespace
 from rdflib import RDF, RDFS, OWL
+
 # Global namespace prefixes loaded from nsprefixes.json
 import json
 import os
-PREFIXES = {"rdf": RDF, "rdfs": RDFS, "owl": OWL, "vg": Namespace("http://vibe.graph/default/")}
 
-# Function to load prefixes from file
+NS_PREFIXES = {
+    "rdf": RDF,
+    "rdfs": RDFS,
+    "owl": OWL,
+    "vg": Namespace("http://vibe.graph/default/"),
+}
 
-def load_global_prefixes(file_path="../nsprefixes.json"):
-    global PREFIXES
+# Function to save and load prefixes from file
+PREFIXE_FILE = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "nsprefixes.json"
+)
+
+
+def save_prefixes(prefixes=NS_PREFIXES, file_path=PREFIXE_FILE):
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump({k: str(v) for k, v in prefixes.items()}, f, indent=2)
+
+
+def load_global_prefixes(file_path=PREFIXE_FILE):
+    global NS_PREFIXES
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        PREFIXES = {k: Namespace(v) for k, v in data.items()}
+        for k, v in data.items():
+            NS_PREFIXES[k] = Namespace(v)
     except Exception:
-        PREFIXES = {"rdf": RDF, "rdfs": RDFS, "owl": OWL, "vg": Namespace("http://vibe.graph/default/")}
+        save_prefixes(NS_PREFIXES, file_path)
+
 
 # Load on import
 load_global_prefixes()
@@ -97,7 +115,7 @@ class Graph:
 
     def wrap(self, value: str, pos="p"):
         defaultNs = Namespace("http://vibe.graph/default/")
-        prefixes = PREFIXES
+        prefixes = NS_PREFIXES
         if pos in ("s", "o"):
             if value.startswith("_:"):
                 return BNode(value[2:])
@@ -166,6 +184,7 @@ class GraphManager:
         self.graphs = {}  # key: graph_id, value: metadata dict
         self.graph_objs = {}  # key: graph_id, value: Graph instance
         self.graph_id_counter = 0
+        self.prefixes = NS_PREFIXES
         self.data_file = data_file
         self._load()
 
@@ -274,10 +293,11 @@ class GraphManager:
         search_engine.create_index()
         count = 0
         for graph_id in self.graph_objs:
-            print("indexing ", self.graphs[graph_id]['name'])
+            print("indexing ", self.graphs[graph_id]["name"])
             self.graph_objs[graph_id].index(search_engine)
             count += 1
         return count
+
     def get_graph(self, graph_id):
         """Retrieve graph metadata for a specific graph ID"""
         return self.graphs.get(graph_id)
@@ -330,6 +350,25 @@ class GraphManager:
             {"subject": str(s), "predicate": str(p), "object": str(o)}
             for s, p, o in graph_obj.graph
         ]
+
+    def save_prefixes(self):
+        save_prefixes(self.prefixes)
+
+    def add_prefix(self, prefix, uri):
+        if prefix in self.prefixes:
+            raise ValueError("Prefix already exists")
+        self.prefixes[prefix] = Namespace(uri)
+        self.save_prefixes()
+
+    def update_prefix(self, prefix, uri):
+        self.prefixes[prefix] = Namespace(uri)
+        self.save_prefixes()
+
+    def remove_prefix(self, prefix, uri):
+        if prefix not in self.prefixes:
+            raise ValueError("Prefix does not exists")
+        del self.prefixes[prefix]
+        self.save_prefixes()
 
 
 # Each graph's RDF data is stored in "graphs_data/<graph_id>.ttl"

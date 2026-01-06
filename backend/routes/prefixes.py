@@ -3,9 +3,13 @@ from routes.graphs import graph_manager
 
 prefixes_bp = Blueprint("prefixes_bp", __name__)
 
+
 @prefixes_bp.route("/api/prefixes", methods=["GET"])
 def get_prefixes():
-    return jsonify(graph_manager.prefixes)
+    return jsonify(
+        [{"prefix": k, "uri": str(v)} for k, v in graph_manager.prefixes.items()]
+    )
+
 
 @prefixes_bp.route("/api/prefixes", methods=["POST"])
 def add_prefix():
@@ -20,6 +24,7 @@ def add_prefix():
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
+
 @prefixes_bp.route("/api/prefixes/<string:prefix>", methods=["PUT"])
 def update_prefix(prefix):
     data = request.get_json()
@@ -31,6 +36,7 @@ def update_prefix(prefix):
         return jsonify({"message": "prefix updated"})
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
+
 
 @prefixes_bp.route("/api/prefixes/<string:prefix>", methods=["DELETE"])
 def delete_prefix(prefix):

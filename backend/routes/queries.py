@@ -4,6 +4,10 @@ import json
 import uuid
 import datetime
 
+# Directory to store query history
+QUERY_HISTORY_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'query_history')
+os.makedirs(QUERY_HISTORY_DIR, exist_ok=True)
+
 from routes.graphs import graph_manager
 from models.query import SPARQLQueryProcessor
 
@@ -13,7 +17,6 @@ sparql_processor = SPARQLQueryProcessor()
 query_bp = Blueprint("query_bp", __name__)
 
 # Routes for SPARQL query interface
-
 
 # Execute a SPARQL query
 @query_bp.route("/api/queries", methods=["POST"])
@@ -43,7 +46,7 @@ def execute_query():
         results = []
         print("query: ", query)
         print("result: ", qres, qres.vars)
-        vars = vars = qres.vars if qres.vars else []
+        vars = qres.vars if qres.vars else []
         for row in qres:
             # Convert each row to a dict of variable name -> value
             if not qres.vars:
@@ -52,67 +55,58 @@ def execute_query():
             else:
                 results.append({str(var): str(row[var]) for var in qres.vars})
         response = {"results": results, "count": len(results), "vars": vars}
+
+        # Persist query history
+        query_id = str(uuid.uuid4())
+        timestamp = datetime.datetime.utcnow().isoformat() + "Z"
+        history_entry = {
+            "query_id": query_id,
+            "query": query,
+            "graph_id": graph_id,
+            "timestamp": timestamp,
+            "results": results
+        }
+        file_path = os.path.join(QUERY_HISTORY_DIR, f"{query_id}.json")
+        with open(file_path, 'w') as f:
+            json.dump(history_entry, f, default=str)
+
+        # Include query_id in response for client reference
+        response["query_id"] = query_id
         return jsonify(response), 200
     except Exception as e:
         print(e)
         e.printStackTrace()
         return jsonify({"error": str(e)}), 400
 
-
 # Get query history
 @query_bp.route("/api/queries/history", methods=["GET"])
 def get_query_history():
-    # This is a simplified implementation - in a real application,
-    # you would retrieve the query history from a persistent storage
-    # For now, we'll just return a mock history
-    mock_history = [
-        {
-            "query": "SELECT ?s ?p ?o WHERE { ?s ?p ?o }",
-            "graph_id": "graph1",
-            "timestamp": "2023-01-01T12:00:00Z",
-            "results": [
-                {
-                    "subject": "http://example.org/subject1",
-                    "predicate": "http://example.org/predicate1",
-                    "object": "http://example.org/object1",
-                }
-            ],
-        },
-        {
-            "query": "SELECT ?s ?p ?o WHERE { ?s ?p ?o }",
-            "graph_id": "graph1",
-            "timestamp": "2023-01-01T12:05:00Z",
-            "results": [
-                {
-                    "subject": "http://example.org/subject2",
-                    "predicate": "http://example.org/predicate2",
-                    "object": "http://example.org/object2",
-                }
-            ],
-        },
-    ]
-
-    return jsonify({"history": mock_history})
-
+    # Retrieve query history from persistent storage
+    history = []
+    if os.path.isdir(QUERY_HISTORY_DIR):
+        for filename in os.listdir(QUERY_HISTORY_DIR):
+            if filename.endswith('.json'):
+                try:
+                    with open(os.path.join(QUERY_HISTORY_DIR, filename), 'r') as f:
+                        entry = json.load(f)
+                        history.append(entry)
+                except Exception:
+                    continue
+    # Sort by timestamp descending
+    history.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+    return jsonify({"history": history})
 
 # Get query results by ID
 @query_bp.route("/api/queries/<query_id>", methods=["GET"])
 def get_query_result(query_id):
-    # This is a simplified implementation - in a real application,
-    # you would retrieve the query result by ID from a persistent storage
-    # For now, we'll just return a mock result
-    mock_result = {
-        "query_id": query_id,
-        "query": "SELECT ?s ?p ?o WHERE { ?s ?p ?o }",
-        "graph_id": "graph1",
-        "timestamp": "2023-01-01T12:00:00Z",
-        "results": [
-            {
-                "subject": "http://example.org/subject1",
-                "predicate": "http://example.org/predicate1",
-                "object": "http://example.org/object1",
-            }
-        ],
-    }
+    # Retrieve the query result by ID from persistent storage
+    file_path = os.path.join(QUERY_HISTORY_DIR, f"{query_id}.json")
+    if not os.path.isfile(file_path):
+        return jsonify({"error": "Query not found"}), 404
+    try:
+        with open(file_path, 'r') as f:
+            entry = json.load(f)
+        return jsonify(entry)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-    return jsonify(mock_result)

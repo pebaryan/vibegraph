@@ -14,7 +14,7 @@ search_engine = WhooshSearchEngine(path="search_index")
 def search_entities():
     data = request.get_json()
     query = data.get("query")
-    search_by = data.get("search_by", "iri")
+    search_by = data.get("search_by", "label")
 
     if not query:
         return jsonify({"error": "Query is required"}), 400

@@ -44,8 +44,8 @@ def execute_query():
         # Execute the query against the RDF graph
         qres = graph_obj.graph.query(query)
         results = []
-        print("query: ", query)
-        print("result: ", qres, qres.vars)
+        # print("query: ", query)
+        # print("result: ", qres, qres.vars)
         vars = qres.vars if qres.vars else []
         for row in qres:
             # Convert each row to a dict of variable name -> value

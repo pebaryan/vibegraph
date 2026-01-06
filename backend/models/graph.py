@@ -108,12 +108,16 @@ class Graph:
         file_path = os.path.join(directory, f"{self.graph_id}.ttl")
         self.graph.serialize(file_path, format="turtle")
 
-    def add_triple(self, triple):
-        self.graph.add(
-            (self.wrap(triple[0], "s"), self.wrap(triple[1]), self.wrap(triple[2], "o"))
+    def add_triple(self, triple, prefixNS=NS_PREFIXES):
+        triple = (
+            self.wrap(triple[0], "s", prefixNS=prefixNS),
+            self.wrap(triple[1], prefixNS=prefixNS),
+            self.wrap(triple[2], "o", prefixNS=prefixNS),
         )
+        print("add ", triple)
+        self.graph.add(triple)
 
-    def wrap(self, value: str, pos="p"):
+    def wrap(self, value: str, pos="p", prefixNS=NS_PREFIXES):
         defaultNs = Namespace("http://vibe.graph/default/")
         prefixes = NS_PREFIXES
         if pos in ("s", "o"):
@@ -145,7 +149,7 @@ class Graph:
             else:
                 return defaultNs[value]
 
-    def index(self, search_engine):
+    def index(self, search_engine, graph_id):
         # Index new triples
         numtris = 0
         for s, p, o in self.graph:
@@ -153,6 +157,7 @@ class Graph:
                 {
                     "iri": str(s),
                     "label": str(s),
+                    "graph_id": graph_id,
                 }
             )
             numtris += 1
@@ -278,7 +283,7 @@ class GraphManager:
         return graph.to_dict()
 
     def index_graph(self, graph_id, search_engine):
-        self.graph_objs[graph_id].index(search_engine)
+        self.graph_objs[graph_id].index(search_engine, graph_id)
 
     def list_graphs(self):
         """List all available graphs with their metadata"""
@@ -294,7 +299,7 @@ class GraphManager:
         count = 0
         for graph_id in self.graph_objs:
             print("indexing ", self.graphs[graph_id]["name"])
-            self.graph_objs[graph_id].index(search_engine)
+            self.graph_objs[graph_id].index(search_engine, graph_id)
             count += 1
         return count
 

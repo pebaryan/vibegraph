@@ -20,11 +20,13 @@ def create_graph():
         return jsonify({"error": "Name is required"}), 400
 
     # Optional SPARQL source parameters
-    sparql_read = data.get('sparql_read')
-    sparql_update = data.get('sparql_update')
-    auth_type = data.get('auth_type', 'None')
-    auth_info = data.get('auth_info')
-    result = graph_manager.create_graph(name, sparql_read, sparql_update, auth_type, auth_info)
+    sparql_read = data.get("sparql_read")
+    sparql_update = data.get("sparql_update")
+    auth_type = data.get("auth_type", "None")
+    auth_info = data.get("auth_info")
+    result = graph_manager.create_graph(
+        name, sparql_read, sparql_update, auth_type, auth_info
+    )
     return jsonify(result), 201
 
 
@@ -69,20 +71,24 @@ def upload_graph(graph_id):
             return jsonify({"error": "Graph not found"}), 404
         # Determine RDF format: use optional form field first
         filename = file.filename.lower()
-        fmt = request.form.get('format')
+        fmt = request.form.get("format")
         if not fmt:
-            if filename.endswith('.ttl') or filename.endswith('.turtle'):
-                fmt = 'turtle'
-            elif filename.endswith('.trig'):
-                fmt = 'trig'
-            elif filename.endswith('.nt'):
-                fmt = 'nt'
-            elif filename.endswith('.nt'):
-                fmt = 'nquads'
-            elif filename.endswith('.rdf') or filename.endswith('.owl') or filename.endswith('xml'):
-                fmt = 'xml'
+            if filename.endswith(".ttl") or filename.endswith(".turtle"):
+                fmt = "turtle"
+            elif filename.endswith(".trig"):
+                fmt = "trig"
+            elif filename.endswith(".nt"):
+                fmt = "nt"
+            elif filename.endswith(".nt"):
+                fmt = "nquads"
+            elif (
+                filename.endswith(".rdf")
+                or filename.endswith(".owl")
+                or filename.endswith("xml")
+            ):
+                fmt = "xml"
             else:
-                fmt = 'turtle'  # default fallback
+                fmt = "turtle"  # default fallback
         graph_obj.graph.parse(file, format=fmt)
         graph_manager._save()
         graph_manager.index_graph(graph_obj, search_engine)
@@ -110,9 +116,11 @@ def delete_graph(graph_id):
 # Re‑index all graphs
 @graph_bp.route("/api/graphs/reindex", methods=["POST"])
 def reindex_all_graphs():
-    count = graph_manager.reindex_all(search_engine)
-    return jsonify({"message": f"Re‑indexed {count} graphs"}), 200
-    return jsonify({"error": "Graph not found"}), 404
+    try:
+        count = graph_manager.reindex_all(search_engine)
+        return jsonify({"message": f"Re‑indexed {count} graphs"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # Update a graph name

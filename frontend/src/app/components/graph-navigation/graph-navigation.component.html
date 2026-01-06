@@ -1,7 +1,19 @@
 <div class="graph-nav-container">
-  <h2>{{ focus }}</h2>
-  <span>{{ focusValue }}</span>
-  <br/>
+  <h2>{{ focusValue ? prefixIt(focusValue) : focus }}</h2>
+  <h5>
+    <a
+      [routerLink]="['/graph-navigation']"
+      [queryParams]="{ id: graphId, focusValue: focusValue }"
+      >{{ focusValue }}</a
+    >
+  </h5>
+  <br />
+  <div>
+    <button mat-flat-button (click)="fetchClasses()">All Classes</button>
+    <button mat-flat-button (click)="fetchTriplesLimited()">
+      Preview Triples
+    </button>
+  </div>
   <table
     mat-table
     [dataSource]="dataSource"
@@ -18,7 +30,7 @@
         *matCellDef="let element"
         (click)="selectEntity(column, element[column], $event)"
       >
-        {{ element[column] }}
+        {{ prefixIt(element[column]) }}
       </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -26,16 +38,36 @@
   </table>
   <p *ngIf="!displayedColumns.length">No results to display.</p>
 
-  <div *ngIf="selectedEntity">
+  <!-- <div *ngIf="selectedEntity">
     <h3>Selected Entity Details</h3>
     <pre>{{ selectedEntity | json }}</pre>
-  </div>
-  <div class="add-triple-form">
-    <input [(ngModel)]="newSubject" placeholder="Subject" />
-    <input [(ngModel)]="newPredicate" placeholder="Predicate" />
-    <input [(ngModel)]="newObject" placeholder="Object" />
-    <button mat-raised-button color="primary" (click)="addTriple()">
-      Add Triple
-    </button>
-  </div>
+  </div> -->
+  <br />
+  <mat-card>
+    <mat-card-title>Add Triple</mat-card-title>
+    <div class="add-triple-form" [formGroup]="tripleForm">
+      <mat-form-field>
+        <mat-label>Subject</mat-label>
+        <input matInput formControlName="subject" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Predicate</mat-label>
+        <input matInput formControlName="predicate" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Object</mat-label>
+        <input matInput formControlName="object" />
+      </mat-form-field>
+      <div>
+        <button
+          [disabled]="!tripleForm.valid"
+          mat-raised-button
+          color="primary"
+          (click)="addTriple()"
+        >
+          Add Triple
+        </button>
+      </div>
+    </div>
+  </mat-card>
 </div>

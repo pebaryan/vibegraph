@@ -43,15 +43,15 @@ export class SettingsComponent implements OnInit {
 
   loadPrefixes() {
     this.loadingPrefixes = true;
-    this.prefixService.getPrefixes().subscribe(
-      (data) => {
+    this.prefixService.getPrefixes().subscribe({
+      next: (data) => {
         this.prefixes = data;
         this.loadingPrefixes = false;
       },
-      () => {
+      error: () => {
         this.loadingPrefixes = false;
-      }
-    );
+      },
+    });
   }
 
   editPrefix(prefix: Prefix) {

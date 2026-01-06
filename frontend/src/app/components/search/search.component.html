@@ -13,10 +13,12 @@
   <div *ngIf="results.length > 0">
     <mat-card *ngFor="let r of results">
       <div>
-        <pre>{{ JSON.stringify(r) }}</pre>
-        <a [routerLink]="['/graph-navigation']" [queryParams]="{ focusValue: r.iri }">{{
-          r.label
-        }}</a>
+        <!-- <pre>{{ JSON.stringify(r) }}</pre> -->
+        <a
+          [routerLink]="['/graph-navigation']"
+          [queryParams]="{ focusValue: r.iri, id: r.graph_id }"
+          >{{ prefixIt(r.label) }}</a
+        >
       </div>
     </mat-card>
   </div>

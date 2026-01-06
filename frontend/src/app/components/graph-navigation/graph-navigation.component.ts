@@ -3,6 +3,13 @@ import { MatTableDataSource } from "@angular/material/table";
 import { GraphService, Triple } from "@app/services/graph.service";
 import { QueryService } from "@app/services/query.service";
 import { ActivatedRoute } from "@angular/router";
+import { Prefix, PrefixService } from "@app/services/prefix.service";
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
 
 @Component({
   selector: "app-graph-navigation",
@@ -23,20 +30,49 @@ export class GraphNavigationComponent implements OnInit {
 
   focus: string = "Graph entities";
   focusValue: string = "";
+  prefixes: Prefix[] = [];
+  tripleForm: FormGroup;
 
   constructor(
     private graphService: GraphService,
     private queryService: QueryService,
-    private route: ActivatedRoute
+    private prefixService: PrefixService,
+    private route: ActivatedRoute,
+    private fb: FormBuilder
   ) {}
 
   ngOnInit() {
+    this.tripleForm = this.fb.group({
+      subject: new FormControl("", Validators.required),
+      predicate: new FormControl("", Validators.required),
+      object: new FormControl("", Validators.required),
+    });
+    this.tripleForm.enable();
     this.graphId = this.route.snapshot.queryParamMap.get("id");
+    this.loadFocus();
+    this.prefixService.getPrefixes().subscribe((data) => {
+      this.prefixes = data;
+    });
+  }
+
+  loadFocus(){
     const value = this.route.snapshot.queryParamMap.get("focusValue");
     if (value) {
       this.focusValue = value;
       this.fetchTriplesByEntity(value);
     } else this.fetchClasses();
+  }
+
+  prefixIt(uri: string): string {
+    var result = uri;
+    this.prefixes.every((p) => {
+      if (uri.startsWith(p.uri)) {
+        result = uri.replace(p.uri, p.prefix + ":");
+        return false;
+      }
+      return true;
+    });
+    return result;
   }
 
   /** Helper to format a term as a URI or literal */
@@ -102,23 +138,19 @@ export class GraphNavigationComponent implements OnInit {
   /** Handle entity selection */
   selectEntity(column: string, value: string, e: any) {
     this.selectedEntity = { type: column, entity: value };
-    this.focus = "Term";
+    this.focus = this.prefixIt(value);
     this.focusValue = value;
     this.fetchTriplesByEntity(value);
   }
 
   /** Add a new triple */
   addTriple() {
-    const triple = {
-      subject: this.newSubject,
-      predicate: this.newPredicate,
-      object: this.newObject,
-    };
-    this.graphService.createTriple(this.graphId, triple).subscribe(() => {
-      this.fetchClasses();
-      this.newSubject = "";
-      this.newPredicate = "";
-      this.newObject = "";
-    });
+    console.log(this.tripleForm.getRawValue());
+    this.graphService
+      .createTriple(this.graphId, this.tripleForm.getRawValue())
+      .subscribe(() => {
+        this.tripleForm.patchValue({ subject: "", predicate: "", object: "" });
+        this.loadFocus();
+      });
   }
 }

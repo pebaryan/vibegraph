@@ -46,3 +46,14 @@ def get_search_result(search_id):
     }
 
     return jsonify(mock_result)
+
+    # Dump all indexed documents
+    @search_bp.route('/api/search/dump', methods=['GET'])
+    def dump_index():
+        if not search_engine.index:
+            return jsonify({'error': 'Index not created'}), 500
+        results = []
+        with search_engine.index.searcher() as searcher:
+            for doc in searcher.documents():
+                results.append(doc)
+        return jsonify({'count': len(results), 'documents': results}), 200

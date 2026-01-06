@@ -130,3 +130,50 @@ paths:
       responses:
         '200':
           description: Search results
+  /api/graphs/reindex:
+    post:
+      summary: Re-index all graphs
+      responses:
+        '200':
+          description: Re-indexed
+  /api/queries/history/{graph_id}:
+    get:
+      summary: Retrieve query history for a graph
+      parameters:
+        - in: path
+          name: graph_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: History
+  /api/queries/{graph_id}/{query_id}:
+    get:
+      summary: Retrieve a specific query result by ID
+      parameters:
+        - in: path
+          name: graph_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: query_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Query result
+  /api/search/{search_id}:
+    get:
+      summary: Retrieve a mock search result by ID
+      parameters:
+        - in: path
+          name: search_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Search result

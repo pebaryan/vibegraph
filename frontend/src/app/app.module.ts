@@ -16,6 +16,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatOptionModule } from '@angular/material/core';
 import { MatTableModule } from '@angular/material/table';
 import {MatCardModule} from '@angular/material/card';
+import { MatSelectModule } from '@angular/material/select';
 
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 
@@ -72,6 +73,7 @@ const routes: Routes = [
     MatOptionModule,
     MatTableModule,
     MatCardModule,
+    MatSelectModule,
     MonacoEditorModule.forRoot()
   ],
   providers: [],

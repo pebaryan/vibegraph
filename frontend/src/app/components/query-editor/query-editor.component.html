@@ -1,20 +1,37 @@
 <div class="query-editor-container">
   <h2>SPARQL Query Editor</h2>
-  <div style="height: 300px; overflow: hidden;">
-    <ngx-monaco-editor [options]="editorOptions" [(ngModel)]="query" style="height:100%;"></ngx-monaco-editor>
+  <div style="height: 300px; overflow: hidden">
+    <ngx-monaco-editor
+      [options]="editorOptions"
+      [(ngModel)]="query"
+      style="height: 100%"
+    ></ngx-monaco-editor>
   </div>
-  <br>
-  <button mat-raised-button color="primary" (click)="execute()" [disabled]="loading || !query">Execute</button>
+  <br />
+  <div style="width: 100%">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="execute()"
+      [disabled]="loading || !query"
+    >
+      Execute
+    </button>
+    <mat-form-field>
+      <mat-label>Query History</mat-label>
+      <mat-select>
+        <mat-option
+          *ngFor="let q of state.history"
+          (click)="query = q; execute()"
+          style="cursor: pointer"
+        >
+          {{ q }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
   <span *ngIf="loading">Running...</span>
-  <div *ngIf="error" style="color:red">{{error}}</div>
-</div>
-<div class="query-editor-container">
-  <h3>Query History</h3>
-  <ul>
-    <li *ngFor="let q of state.history" (click)="query = q; execute()" style="cursor:pointer">
-      {{q}}
-    </li>
-  </ul>
+  <div *ngIf="error" style="color: red">{{ error }}</div>
 </div>
 <div class="query-editor-container">
   <app-query-results></app-query-results>

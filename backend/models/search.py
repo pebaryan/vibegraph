@@ -32,7 +32,6 @@ class WhooshSearchEngine:
             id=ID(stored=True),
             iri=TEXT(stored=True),
             label=TEXT(stored=True),
-            properties=TEXT(stored=True)
         )
 
         # Create the index on disk
@@ -44,13 +43,12 @@ class WhooshSearchEngine:
         writer = self.index.writer()
         writer.add_document(
             id=str(uuid.uuid4()),
-            iri=entity.get('iri', ''),
-            label=entity.get('label', ''),
-            properties=json.dumps(entity.get('properties', []))
+            iri=entity.get("iri", ""),
+            label=entity.get("label", "")
         )
         writer.commit()
 
-    def search(self, query, search_by='label'):
+    def search(self, query, search_by="label"):
         """Search for entities using Whoosh"""
         # In a real application, you would parse the query and execute the search
         # against the Whoosh index
@@ -58,34 +56,43 @@ class WhooshSearchEngine:
         # For demonstration purposes, we'll just return a mock result
         mock_results = [
             {
-                'iri': 'http://example.org/entity1',
-                'label': 'Entity 1',
-                'properties': [
-                    {'predicate': 'http://example.org/predicate1', 'object': 'http://example.org/object1'},
-                    {'predicate': 'http://example.org/predicate2', 'object': 'http://example.org/object2'}
-                ]
+                "iri": "http://example.org/entity1",
+                "label": "Entity 1",
+                "properties": [
+                    {
+                        "predicate": "http://example.org/predicate1",
+                        "object": "http://example.org/object1",
+                    },
+                    {
+                        "predicate": "http://example.org/predicate2",
+                        "object": "http://example.org/object2",
+                    },
+                ],
             },
             {
-                'iri': 'http://example.org/entity2',
-                'label': 'Entity 2',
-                'properties': [
-                    {'predicate': 'http://example.org/predicate3', 'object': 'http://example.org/object3'}
-                ]
-            }
+                "iri": "http://example.org/entity2",
+                "label": "Entity 2",
+                "properties": [
+                    {
+                        "predicate": "http://example.org/predicate3",
+                        "object": "http://example.org/object3",
+                    }
+                ],
+            },
         ]
         mock_results = self.get_results(query, search_by)
 
         return {
-            'query': query,
-            'search_by': search_by,
-            'results': mock_results,
-            'count': len(mock_results)
+            "query": query,
+            "search_by": search_by,
+            "results": mock_results,
+            "count": len(mock_results),
         }
 
-    def get_results(self, query, search_by='label'):
+    def get_results(self, query, search_by="label"):
         """Get search results for a query"""
         if not self.index:
-            return {'error': 'Index not created'}
+            return {"error": "Index not created"}
 
         # Parse the query
         parser = QueryParser("label", schema=self.index.schema)
@@ -98,15 +105,16 @@ class WhooshSearchEngine:
             # Convert results to a list of dictionaries
             formatted_results = []
             for result in results:
-                formatted_results.append({
-                    'iri': result['iri'],
-                    'label': result['label'],
-                    'properties': json.loads(result['properties'])
-                })
+                formatted_results.append(
+                    {
+                        "iri": result["iri"],
+                        "label": result["label"],
+                    }
+                )
 
             return {
-                'query': query,
-                'search_by': search_by,
-                'results': formatted_results,
-                'count': len(formatted_results)
+                "query": query,
+                "search_by": search_by,
+                "results": formatted_results,
+                "count": len(formatted_results),
             }

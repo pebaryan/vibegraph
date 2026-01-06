@@ -80,15 +80,8 @@ def upload_graph(graph_id):
         else:
             fmt = 'turtle'  # default fallback
         graph_obj.graph.parse(file, format=fmt)
-        # Index new triples
-        for s, p, o in graph_obj.graph:
-            search_engine.add_entity(
-                {
-                    "iri": str(s),
-                    "label": str(s),
-                    "properties": [{"predicate": str(p), "object": str(o)}],
-                }
-            )
+        graph_manager._save()
+        graph_manager.index(graph_obj, search_engine)
         return jsonify({"message": "Graph uploaded"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400

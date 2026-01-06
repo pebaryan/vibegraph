@@ -92,6 +92,16 @@ class Graph:
             else:
                 return defaultNs[value]
 
+    def index(self, search_engine):
+        # Index new triples
+        for s, p, o in self.graph:
+            search_engine.add_entity(
+                {
+                    "iri": str(s),
+                    "label": str(s),
+                }
+            )
+
     @staticmethod
     def load_from_file(file_path, graph_id, name, created_at, sparql_read=None, sparql_update=None, auth_type='None', auth_info=None):
         """Load an RDF graph from a Turtle file and return a Graph instance."""
@@ -163,6 +173,9 @@ class GraphManager:
         self.graph_objs[graph_id] = graph
         self._save()
         return graph.to_dict()
+    
+    def index_graph(self, graph_id, search_engine):
+        self.graph[graph_id].index(search_engine)
 
     def list_graphs(self):
         """List all available graphs with their metadata"""

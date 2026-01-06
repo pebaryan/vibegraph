@@ -15,7 +15,10 @@
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef>Name</th>
       <td mat-cell *matCellDef="let graph">
-        <a [routerLink]="['/graph-navigation']" [queryParams]="{ id: graph.graph_id }">
+        <a
+          [routerLink]="['/graph-navigation']"
+          [queryParams]="{ id: graph.graph_id }"
+        >
           {{ graph.name }}</a
         >
       </td>
@@ -25,7 +28,7 @@
     <ng-container matColumnDef="created_at">
       <th mat-header-cell *matHeaderCellDef>Created</th>
       <td mat-cell *matCellDef="let graph">
-        {{ graph.created_at | date : "short" }}
+        {{ graph.created_at | amTimeAgo }}
       </td>
     </ng-container>
 

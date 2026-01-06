@@ -19,6 +19,7 @@ import { MatCardModule } from "@angular/material/card";
 import { MatSelectModule } from "@angular/material/select";
 
 import { MonacoEditorModule } from "ngx-monaco-editor-v2";
+import { MomentModule } from 'ngx-moment';
 
 import { AppComponent } from '@app/app.component';
 import { QueryEditorComponent } from '@app/components/query-editor/query-editor.component';
@@ -81,6 +82,7 @@ const routes: Routes = [
     MatCardModule,
     MatSelectModule,
     MonacoEditorModule.forRoot(),
+    MomentModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

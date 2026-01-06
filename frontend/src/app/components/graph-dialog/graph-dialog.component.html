@@ -25,6 +25,15 @@
     style="margin-top: 8px"
   >
     <input type="file" (change)="onFileSelected($event)" />
+    <div *ngIf="nameForm.get('guessedFormat')?.value" style="margin-top:4px;">
+      <span>Guessed format: {{ nameForm.get('guessedFormat')?.value }}</span>
+    </div>
+    <div *ngIf="nameForm.get('availableFormats')?.value?.length > 0" style="margin-top:8px;">
+      <mat-label>Choose format</mat-label>
+      <mat-radio-group formControlName="format">
+        <mat-radio-button *ngFor="let fmt of nameForm.get('availableFormats')?.value" [value]="fmt">{{ fmt }}</mat-radio-button>
+      </mat-radio-group>
+    </div>
   </div>
 
   <div

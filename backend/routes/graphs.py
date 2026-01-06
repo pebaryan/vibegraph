@@ -67,7 +67,7 @@ def upload_graph(graph_id):
         graph_obj = graph_manager.get_graph_object(graph_id)
         if not graph_obj:
             return jsonify({"error": "Graph not found"}), 404
-        # Determine RDF format from file extension
+        # Determine RDF format: use optional form field first
         filename = file.filename.lower()
         if filename.endswith('.ttl') or filename.endswith('.turtle'):
             fmt = 'turtle'

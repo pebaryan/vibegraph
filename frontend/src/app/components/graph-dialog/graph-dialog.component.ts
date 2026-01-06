@@ -20,6 +20,8 @@ export class GraphDialogComponent {
     dataSource: ['none'],
     file: [null],
     format: ['ttl'],
+    guessedFormat: [''],
+    availableFormats: [],
     sparqlRead: [''],
     sparqlUpdate: [''],
     authType: ['None'],
@@ -39,9 +41,36 @@ export class GraphDialogComponent {
     }
   }
 
+  /**
+   * Guess RDF format from file extension.
+   */
+  private guessFormat(file: File): string {
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    const mapping: { [key: string]: string } = {
+      ttl: 'ttl',
+      turtle: 'ttl',
+      trig: 'trig',
+      nt: 'nt',
+      rdf: 'rdfxml',
+      xml: 'rdfxml',
+      jsonld: 'jsonld',
+      json: 'jsonld',
+    };
+    return mapping[ext ?? ''] ?? 'ttl';
+  }
+
+  /**
+   * Update form controls when a file is selected.
+   */
   onFileSelected(event: any) {
     const file = event.target.files[0];
     this.nameForm.patchValue({ file });
+    const guessed = this.guessFormat(file);
+    this.nameForm.patchValue({ guessedFormat: guessed, format: guessed });
+    // expose supported formats for radio group
+    this.nameForm.patchValue({
+      availableFormats: ['ttl', 'trig', 'nt', 'rdfxml', 'jsonld'],
+    });
   }
 
   onSave(): void {
@@ -69,7 +98,8 @@ export class GraphDialogComponent {
     if (this.data.mode === 'create') {
       this.graphService.createGraph(payload).subscribe((res: any) => {
         if (form.dataSource === 'file' && this.nameForm.get('file')?.value) {
-          this.graphService.uploadGraphFile(res.graph_id, this.nameForm.get('file')?.value as File).subscribe(() => {
+          const format = this.nameForm.get('format')?.value;
+          this.graphService.uploadGraphFile(res.graph_id, this.nameForm.get('file')?.value as File, format).subscribe(() => {
             this.dialogRef.close(res);
           });
         } else {

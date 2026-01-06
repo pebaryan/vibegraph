@@ -5,6 +5,9 @@
 A Web UI for RDFLib.
 This repository contains a lightweight backend built with Flask and a frontend Angular application that lets users query and visualize RDF data. User can create empty graph or upload from existing RDF files or connect to a SPARQL endpoint (not tested). User can explore the content of each graph by listing all classes and navigate through each URI. User can search for URI.
 
+### Tools
+made with [vibe-kanban](https://github.com/BloopAI/vibe-kanban), [claude-code-router](https://github.com/musistudio/claude-code-router), [claude-code](https://claude.com/product/claude-code), [llama.cpp](https://github.com/ggml-org/llama.cpp), [gemini](https://gemini.google.com/app), [chatGPT](https://chatgpt.com/) using [GPT4-oss:20b](https://huggingface.co/ggml-org/gpt-oss-20b-GGUF)
+
 ## Screenshots
 
 ![explore graphs](<images/Screenshot 2026-01-06 232610.png>) ![overview](<images/Screenshot 2026-01-06 232428.png>) ![visualization](<images/Screenshot 2026-01-06 232507.png>) ![SPARQL query](<images/Screenshot 2026-01-06 232534.png>) ![URI search](<images/Screenshot 2026-01-06 232550.png>)

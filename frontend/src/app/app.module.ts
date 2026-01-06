@@ -23,7 +23,7 @@ import { MonacoEditorModule } from "ngx-monaco-editor-v2";
 import { AppComponent } from '@app/app.component';
 import { QueryEditorComponent } from '@app/components/query-editor/query-editor.component';
 import { GraphViewComponent } from '@app/components/graph-view/graph-view.component';
-import { NavigationComponent } from '@app/components/navigation/navigation.component';
+import { GraphNavigationComponent } from '@app/components/graph-navigation/graph-navigation.component';
 import { QueryHistoryComponent } from '@app/components/query-history/query-history.component';
 import { QueryResultsComponent } from '@app/components/query-results/query-results.component';
 import { GraphListComponent } from '@app/components/graph-list/graph-list.component';
@@ -38,7 +38,7 @@ const routes: Routes = [
   { path: 'graph', component: GraphViewComponent },
   { path: 'graphs', component: GraphListComponent },
   { path: 'search', component: SearchComponent },
-  { path: 'nav', component: NavigationComponent },
+  { path: 'graph-navigation', component: GraphNavigationComponent },
   { path: "history", component: QueryHistoryComponent },
   { path: 'settings', component: SettingsComponent },
   { path: '**', redirectTo: 'graphs' }

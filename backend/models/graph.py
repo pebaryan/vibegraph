@@ -119,15 +119,28 @@ class GraphManager:
                     graph = Graph(graph_id, meta.get('name', ''), meta.get('created_at', ''), meta.get('sparql_read'), meta.get('sparql_update'), meta.get('auth_type', 'None'), meta.get('auth_info'))
                     self.graphs[graph_id] = meta
                     self.graph_objs[graph_id] = graph
-        # Load RDF data files
+        # Load RDF data files and sync metadata
         data_dir = os.path.join(os.path.dirname(self.data_file), 'graphs_data')
-        if os.path.isdir(data_dir):
-            for fname in os.listdir(data_dir):
-                if fname.endswith('.ttl'):
-                    gid = fname[:-4]
-                    if gid in self.graph_objs:
-                        file_path = os.path.join(data_dir, fname)
-                        self.graph_objs[gid] = Graph.load_from_file(file_path, gid, self.graphs[gid].get('name', ''), self.graphs[gid].get('created_at', ''), self.graphs[gid].get('sparql_read'), self.graphs[gid].get('sparql_update'), self.graphs[gid].get('auth_type', 'None'), self.graphs[gid].get('auth_info'))
+        if not os.path.isdir(data_dir):
+            os.makedirs(data_dir, exist_ok=True)
+        existing_files = set()
+        for fname in os.listdir(data_dir):
+            if fname.endswith('.ttl'):
+                gid = fname[:-4]
+                existing_files.add(gid)
+                # Create metadata if missing
+                if gid not in self.graphs:
+                    created_at = datetime.now().isoformat()
+                    self.graphs[gid] = {'name': gid, 'created_at': created_at, 'sparql_read': None, 'sparql_update': None, 'auth_type': 'None', 'auth_info': None}
+                file_path = os.path.join(data_dir, fname)
+                self.graph_objs[gid] = Graph.load_from_file(file_path, gid, self.graphs[gid].get('name', ''), self.graphs[gid].get('created_at', ''), self.graphs[gid].get('sparql_read'), self.graphs[gid].get('sparql_update'), self.graphs[gid].get('auth_type', 'None'), self.graphs[gid].get('auth_info'))
+        # Remove metadata entries for missing files
+        for gid in list(self.graphs.keys()):
+            if gid not in existing_files:
+                del self.graphs[gid]
+                self.graph_objs.pop(gid, None)
+        # Persist changes
+        self._save()
 
     def _save(self):
         """Persist current graph metadata and RDF data to storage."""

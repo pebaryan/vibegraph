@@ -4,7 +4,7 @@ import { GraphService } from '../../services/graph.service';
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.css']
+  styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent {
   loading = false;

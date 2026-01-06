@@ -14,7 +14,7 @@
     <mat-card *ngFor="let r of results">
       <div>
         <pre>{{ JSON.stringify(r) }}</pre>
-        <a [routerLink]="['/nav']" [queryParams]="{ focusValue: r.iri }">{{
+        <a [routerLink]="['/graph-navigation']" [queryParams]="{ focusValue: r.iri }">{{
           r.label
         }}</a>
       </div>

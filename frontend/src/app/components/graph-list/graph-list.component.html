@@ -15,7 +15,7 @@
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef>Name</th>
       <td mat-cell *matCellDef="let graph">
-        <a [routerLink]="['/nav']" [queryParams]="{ id: graph.graph_id }">
+        <a [routerLink]="['/graph-navigation']" [queryParams]="{ id: graph.graph_id }">
           {{ graph.name }}</a
         >
       </td>

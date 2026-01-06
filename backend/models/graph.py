@@ -110,6 +110,7 @@ class Graph:
 
     def index(self, search_engine):
         # Index new triples
+        numtris = 0
         for s, p, o in self.graph:
             search_engine.add_entity(
                 {
@@ -117,6 +118,8 @@ class Graph:
                     "label": str(s),
                 }
             )
+            numtris += 1
+        print(f"indexed {numtris} triples")
 
     @staticmethod
     def load_from_file(
@@ -252,6 +255,7 @@ class GraphManager:
         search_engine.create_index()
         count = 0
         for graph_id in self.graph_objs:
+            print("indexing ", self.graphs[graph_id]['name'])
             self.graph_objs[graph_id].index(search_engine)
             count += 1
         return count

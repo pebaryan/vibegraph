@@ -13,7 +13,7 @@ search_engine = WhooshSearchEngine(path="search_index")
 def search_entities():
     data = request.get_json()
     query = data.get('query')
-    search_by = data.get('search_by', 'label')
+    search_by = data.get('search_by', 'iri')
 
     if not query:
         return jsonify({'error': 'Query is required'}), 400
@@ -32,7 +32,7 @@ def get_search_result(search_id):
     mock_result = {
         'search_id': search_id,
         'query': 'search for entities',
-        'search_by': 'label',
+        'search_by': '',
         'results': [
             {
                 'iri': 'http://example.org/entity1',

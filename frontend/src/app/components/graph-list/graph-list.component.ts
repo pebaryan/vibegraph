@@ -82,7 +82,7 @@ export class GraphListComponent implements OnInit {
   }
 
   examineGraph(graph: Graph): void {
-    this.router.navigate(['/nav'], { queryParams: { id: graph.graph_id } });
+    this.router.navigate(['/graph-navigation'], { queryParams: { id: graph.graph_id } });
   }
 
   viewGraph(graph: Graph): void {

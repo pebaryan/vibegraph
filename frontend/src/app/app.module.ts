@@ -49,7 +49,7 @@ const routes: Routes = [
     AppComponent,
     QueryEditorComponent,
     GraphViewComponent,
-    NavigationComponent,
+    GraphNavigationComponent,
     QueryHistoryComponent,
     QueryResultsComponent,
     GraphListComponent,

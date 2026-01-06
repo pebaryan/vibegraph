@@ -48,54 +48,20 @@ class WhooshSearchEngine:
         )
         writer.commit()
 
-    def search(self, query, search_by="label"):
+    def search(self, query, search_by="iri"):
         """Search for entities using Whoosh"""
         # In a real application, you would parse the query and execute the search
         # against the Whoosh index
 
-        # For demonstration purposes, we'll just return a mock result
-        mock_results = [
-            {
-                "iri": "http://example.org/entity1",
-                "label": "Entity 1",
-                "properties": [
-                    {
-                        "predicate": "http://example.org/predicate1",
-                        "object": "http://example.org/object1",
-                    },
-                    {
-                        "predicate": "http://example.org/predicate2",
-                        "object": "http://example.org/object2",
-                    },
-                ],
-            },
-            {
-                "iri": "http://example.org/entity2",
-                "label": "Entity 2",
-                "properties": [
-                    {
-                        "predicate": "http://example.org/predicate3",
-                        "object": "http://example.org/object3",
-                    }
-                ],
-            },
-        ]
-        mock_results = self.get_results(query, search_by)
+        return self.get_results(query, search_by)
 
-        return {
-            "query": query,
-            "search_by": search_by,
-            "results": mock_results,
-            "count": len(mock_results),
-        }
-
-    def get_results(self, query, search_by="label"):
+    def get_results(self, query, search_by="iri"):
         """Get search results for a query"""
         if not self.index:
             return {"error": "Index not created"}
 
         # Parse the query
-        parser = QueryParser("label", schema=self.index.schema)
+        parser = QueryParser(search_by, schema=self.index.schema)
         query_obj = parser.parse(query)
 
         # Execute the search

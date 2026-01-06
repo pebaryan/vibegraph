@@ -14,11 +14,12 @@ export interface GraphDialogData {
   templateUrl: './graph-dialog.component.html',
   styleUrls: ['./graph-dialog.component.scss'],
 })
-export class GraphDialogComponent {
+export class GraphDialogComponent { 
   nameForm = this.fb.group({
     name: ['', Validators.required],
     dataSource: ['none'],
     file: [null],
+    format: ['ttl'],
     sparqlRead: [''],
     sparqlUpdate: [''],
     authType: ['None'],

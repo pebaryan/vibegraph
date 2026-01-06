@@ -29,7 +29,6 @@ class WhooshSearchEngine:
 
         # Define the schema for the index
         schema = Schema(
-            id=ID(stored=True),
             iri=TEXT(stored=True),
             label=TEXT(stored=True),
         )
@@ -42,7 +41,6 @@ class WhooshSearchEngine:
         # entity is expected to be a dict with keys: iri, label, properties (list of dicts)
         writer = self.index.writer()
         writer.add_document(
-            id=str(uuid.uuid4()),
             iri=entity.get("iri", ""),
             label=entity.get("label", "")
         )

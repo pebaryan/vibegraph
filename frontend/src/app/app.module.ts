@@ -25,6 +25,7 @@ import { AppComponent } from '@app/app.component';
 import { QueryEditorComponent } from '@app/components/query-editor/query-editor.component';
 import { GraphViewComponent } from '@app/components/graph-view/graph-view.component';
 import { GraphNavigationComponent } from '@app/components/graph-navigation/graph-navigation.component';
+import { AddTripleComponent } from '@app/components/add-triple/add-triple.component';
 import { QueryHistoryComponent } from '@app/components/query-history/query-history.component';
 import { QueryResultsComponent } from '@app/components/query-results/query-results.component';
 import { GraphListComponent } from '@app/components/graph-list/graph-list.component';

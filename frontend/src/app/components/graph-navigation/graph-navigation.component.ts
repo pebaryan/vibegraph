@@ -4,12 +4,6 @@ import { GraphService, Triple } from "@app/services/graph.service";
 import { QueryService } from "@app/services/query.service";
 import { ActivatedRoute } from "@angular/router";
 import { Prefix, PrefixService } from "@app/services/prefix.service";
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from "@angular/forms";
 
 @Component({
   selector: "app-graph-navigation",
@@ -31,23 +25,15 @@ export class GraphNavigationComponent implements OnInit {
   focus: string = "Graph entities";
   focusValue: string = "";
   prefixes: Prefix[] = [];
-  tripleForm: FormGroup;
 
   constructor(
     private graphService: GraphService,
     private queryService: QueryService,
     private prefixService: PrefixService,
-    private route: ActivatedRoute,
-    private fb: FormBuilder
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
-    this.tripleForm = this.fb.group({
-      subject: new FormControl("", Validators.required),
-      predicate: new FormControl("", Validators.required),
-      object: new FormControl("", Validators.required),
-    });
-    this.tripleForm.enable();
     this.graphId = this.route.snapshot.queryParamMap.get("id");
     this.loadFocus();
     this.prefixService.getPrefixes().subscribe((data) => {
@@ -141,16 +127,5 @@ export class GraphNavigationComponent implements OnInit {
     this.focus = this.prefixIt(value);
     this.focusValue = value;
     this.fetchTriplesByEntity(value);
-  }
-
-  /** Add a new triple */
-  addTriple() {
-    console.log(this.tripleForm.getRawValue());
-    this.graphService
-      .createTriple(this.graphId, this.tripleForm.getRawValue())
-      .subscribe(() => {
-        this.tripleForm.patchValue({ subject: "", predicate: "", object: "" });
-        this.loadFocus();
-      });
   }
 }

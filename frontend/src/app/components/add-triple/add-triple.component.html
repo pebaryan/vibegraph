@@ -1,0 +1,19 @@
+<div class="add-triple-form" [formGroup]="tripleForm">
+  <mat-form-field>
+    <mat-label>Subject</mat-label>
+    <input matInput formControlName="subject" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Predicate</mat-label>
+    <input matInput formControlName="predicate" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Object</mat-label>
+    <input matInput formControlName="object" />
+  </mat-form-field>
+  <div>
+    <button [disabled]="!tripleForm.valid" mat-raised-button color="primary" (click)="addTriple()">
+      Add Triple
+    </button>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { BaseService } from './base.service';
 
 export interface Graph {
   graph_id: string;
@@ -23,29 +23,24 @@ export interface TripleResult {
 @Injectable({
   providedIn: 'root',
 })
-export class GraphService {
-  private readonly apiHost = '//localhost:5000'
-  private readonly baseUrl = this.apiHost + '/api/graphs';
+export class GraphService extends BaseService {
+  private readonly baseUrl: string;
 
-  constructor(private http: HttpClient) {}
+  constructor(http: HttpClient) {
+    super(http);
+    this.baseUrl = `${this.apiHost}/api/graphs`;
+  }
 
   listGraphs(): Observable<Graph[]> {
-    return this.http.get<{ graphs: Graph[] }>(this.baseUrl).pipe(
-      map((res) => res.graphs),
-      catchError(this.handleError)
-    );
+    return this.http.get<{ graphs: Graph[] }>(this.baseUrl);
   }
 
   getTriples(graphId: string): Observable<TripleResult> {
-    return this.http.get<TripleResult>(`${this.baseUrl}/${graphId}/triples`).pipe(
-      catchError(this.handleError)
-    );
+    return this.http.get<TripleResult>(`${this.baseUrl}/${graphId}/triples`);
   }
 
   createTriple(graphId: string, triple: Triple): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${graphId}/triples`, triple).pipe(
-      catchError(this.handleError)
-    );
+    return this.http.post(`${this.baseUrl}/${graphId}/triples`, triple);
   }
 
   /**
@@ -53,21 +48,15 @@ export class GraphService {
    * @param params Object containing graph creation parameters.
    */
   createGraph(params: {name: string, sparql_read?: string, sparql_update?: string, auth_type?: string, auth_info?: any}): Observable<Graph> {
-    return this.http.post<Graph>(this.baseUrl, params).pipe(
-      catchError(this.handleError)
-    );
+    return this.http.post<Graph>(this.baseUrl, params);
   }
 
   updateGraph(id: string, name: string): Observable<any> {
-    return this.http.put(`${this.baseUrl}/${id}`, { name }).pipe(
-      catchError(this.handleError)
-    );
+    return this.http.put(`${this.baseUrl}/${id}`, { name });
   }
 
   deleteGraph(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`).pipe(
-      catchError(this.handleError)
-    );
+    return this.http.delete(`${this.baseUrl}/${id}`);
   }
 
   /**
@@ -90,21 +79,6 @@ export class GraphService {
     if (format) {
       formData.append('format', format);
     }
-    return this.http.post(`${this.baseUrl}/${graphId}/upload`, formData).pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  private handleError(error: HttpErrorResponse) {
-    // In a real app, you might use a remote logging infrastructure
-    let errorMsg = 'An unknown error occurred';
-    if (error.error instanceof ErrorEvent) {
-      // Client-side/network error
-      errorMsg = `Network error: ${error.error.message}`;
-    } else {
-      // Backend returned an unsuccessful response code.
-      errorMsg = error.error?.error || `Server returned code ${error.status}`;
-    }
-    return throwError(errorMsg);
+    return this.http.post(`${this.baseUrl}/${graphId}/upload`, formData);
   }
 }

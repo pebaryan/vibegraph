@@ -29,3 +29,4 @@ graph_data.json
 search_index
 query_history
 nsprefixes.json
+.coverage

@@ -5,7 +5,8 @@ import uuid
 import datetime
 
 # Directory to store query history
-QUERY_HISTORY_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'query_history')
+from config import QUERY_HISTORY_DIR
+
 os.makedirs(QUERY_HISTORY_DIR, exist_ok=True)
 
 from routes.graphs import graph_manager
@@ -17,6 +18,7 @@ sparql_processor = SPARQLQueryProcessor()
 query_bp = Blueprint("query_bp", __name__)
 
 # Routes for SPARQL query interface
+
 
 # Execute a SPARQL query
 @query_bp.route("/api/queries", methods=["POST"])
@@ -32,7 +34,7 @@ def execute_query():
         if len(graphs) == 0:
             return jsonify({"error": "no graph available"}), 404
         else:
-            graph_id = graphs.pop().get('graph_id')
+            graph_id = graphs.pop().get("graph_id")
         # return jsonify({'error': 'Graph ID is required'}), 400
 
     # Retrieve the Graph instance
@@ -50,8 +52,10 @@ def execute_query():
         for row in qres:
             # Convert each row to a dict of variable name -> value
             if not qres.vars:
-                vars = ['s', 'p', 'o']
-                results.append({str(var): str(row[idx]) for idx,var in zip(range(3),'spo')})
+                vars = ["s", "p", "o"]
+                results.append(
+                    {str(var): str(row[idx]) for idx, var in zip(range(3), "spo")}
+                )
             else:
                 results.append({str(var): str(row[var]) for var in qres.vars})
         response = {"results": results, "count": len(results), "vars": vars}
@@ -63,13 +67,13 @@ def execute_query():
             "query_id": query_id,
             "query": query,
             "timestamp": timestamp,
-            "results": results
+            "results": results,
         }
         history_dir = os.path.join(QUERY_HISTORY_DIR, graph_id)
         if not os.path.exists(history_dir):
             os.makedirs(history_dir)
         file_path = os.path.join(history_dir, f"{query_id}.json")
-        with open(file_path, 'w') as f:
+        with open(file_path, "w") as f:
             json.dump(history_entry, f, default=str)
 
         # Include query_id in response for client reference
@@ -80,6 +84,7 @@ def execute_query():
         e.printStackTrace()
         return jsonify({"error": str(e)}), 400
 
+
 # Get query history
 @query_bp.route("/api/queries/history/<graph_id>", methods=["GET"])
 def get_query_history(graph_id):
@@ -88,9 +93,9 @@ def get_query_history(graph_id):
     history_dir = os.path.join(QUERY_HISTORY_DIR, graph_id)
     if os.path.isdir(history_dir):
         for filename in os.listdir(history_dir):
-            if filename.endswith('.json'):
+            if filename.endswith(".json"):
                 try:
-                    with open(os.path.join(history_dir, filename), 'r') as f:
+                    with open(os.path.join(history_dir, filename), "r") as f:
                         entry = json.load(f)
                         history.append(entry)
                 except Exception:
@@ -98,6 +103,7 @@ def get_query_history(graph_id):
     # Sort by timestamp descending
     history.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
     return jsonify({"history": history})
+
 
 # Get query results by ID
 @query_bp.route("/api/queries/<graph_id>/<query_id>", methods=["GET"])
@@ -108,9 +114,8 @@ def get_query_result(graph_id, query_id):
     if not os.path.isfile(file_path):
         return jsonify({"error": "Query not found"}), 404
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             entry = json.load(f)
         return jsonify(entry)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-

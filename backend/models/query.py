@@ -4,6 +4,7 @@ import json
 
 # SPARQL Query Processing Model
 
+
 class SPARQLQueryProcessor:
     def __init__(self):
         self.graph = Graph()
@@ -20,43 +21,43 @@ class SPARQLQueryProcessor:
 
             # For now, we'll just return a mock result
             mock_result = {
-                'query': query,
-                'results': [
+                "query": query,
+                "results": [
                     {
-                        'subject': 'http://example.org/subject1',
-                        'predicate': 'http://example.org/predicate1',
-                        'object': 'http://example.org/object1'
+                        "subject": "http://example.org/subject1",
+                        "predicate": "http://example.org/predicate1",
+                        "object": "http://example.org/object1",
                     },
                     {
-                        'subject': 'http://example.org/subject2',
-                        'predicate': 'http://example.org/predicate2',
-                        'object': 'http://example.org/object2'
-                    }
+                        "subject": "http://example.org/subject2",
+                        "predicate": "http://example.org/predicate2",
+                        "object": "http://example.org/object2",
+                    },
                 ],
-                'count': 2
+                "count": 2,
             }
 
             return mock_result
         except Exception as e:
-            return {
-                'error': str(e),
-                'query': query
+            return {"error": str(e), "query": query}
+
+
+def format_results(self, results):
+    """Format query results for display in frontend"""
+    if "error" in results:
+        return {"error": results["error"]}
+
+    formatted_results = []
+    for result in results["results"]:
+        formatted_results.append(
+            {
+                "subject": result.get("subject", ""),
+                "predicate": result.get("predicate", ""),
+                "object": result.get("object", ""),
             }
+        )
 
-    def format_results(self, results):
-        """Format query results for display in the frontend"""
-        if 'error' in results:
-            return {'error': results['error']}
-
-        formatted_results = []
-        for result in results['results']:
-            formatted_results.append({
-                'subject': result['subject'],
-                'predicate': result['predicate'],
-                'object': result['object']
-            })
-
-        return {
-            'results': formatted_results,
-            'count': results['count']
-        }
+    return {
+        "results": formatted_results,
+        "count": results.get("count", len(formatted_results)),
+    }

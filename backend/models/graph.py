@@ -6,6 +6,9 @@ from rdflib import Graph as RDFGraph
 from rdflib import URIRef, Literal, BNode, Namespace
 from rdflib import RDF, RDFS, OWL
 
+# Import configuration
+from config import GRAPHS_DATA_DIR, GRAPH_DATA_FILE
+
 # Global namespace prefixes loaded from nsprefixes.json
 import json
 import os
@@ -212,7 +215,7 @@ class GraphManager:
                     self.graphs[graph_id] = meta
                     self.graph_objs[graph_id] = graph
         # Load RDF data files and sync metadata
-        data_dir = os.path.join(os.path.dirname(self.data_file), "graphs_data")
+        data_dir = GRAPHS_DATA_DIR
         if not os.path.isdir(data_dir):
             os.makedirs(data_dir, exist_ok=True)
         existing_files = set()
@@ -254,7 +257,7 @@ class GraphManager:
     def _save(self):
         """Persist current graph metadata and RDF data to storage."""
         # Ensure data directory exists
-        data_dir = os.path.join(os.path.dirname(self.data_file), "graphs_data")
+        data_dir = GRAPHS_DATA_DIR
         os.makedirs(data_dir, exist_ok=True)
         # Save metadata
         with open(self.data_file, "w", encoding="utf-8") as f:

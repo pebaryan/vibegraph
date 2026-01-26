@@ -30,3 +30,4 @@ search_index
 query_history
 nsprefixes.json
 .coverage
+htmlcov

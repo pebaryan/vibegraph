@@ -24,3 +24,6 @@ yarn-error.log
 .angular/
 
 venv
+.claude
+.ruff_cache
+.pytest_cache

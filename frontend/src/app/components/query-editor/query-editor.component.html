@@ -1,38 +1,89 @@
 <div class="query-editor-container">
   <h2>SPARQL Query Editor</h2>
-  <div style="height: 300px; overflow: hidden">
-    <ngx-monaco-editor
-      [options]="editorOptions"
-      [(ngModel)]="query"
-      style="height: 100%"
-    ></ngx-monaco-editor>
-  </div>
-  <br />
-  <div style="width: 100%">
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="execute()"
-      [disabled]="loading || !query"
-    >
-      Execute
-    </button>
-    <mat-form-field>
-      <mat-label>Query History</mat-label>
-      <mat-select>
-        <mat-option
-          *ngFor="let q of state.history"
-          (click)="query = q; execute()"
-          style="cursor: pointer"
+  <div class="editor-layout">
+    <aside class="editor-sidebar">
+      <mat-card class="sidebar-card">
+        <mat-card-title>Templates</mat-card-title>
+        <mat-card-content>
+          <button
+            mat-stroked-button
+            color="primary"
+            class="sidebar-button"
+            *ngFor="let t of templates"
+            (click)="insertTemplate(t.query)"
+          >
+            {{ t.name }}
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="sidebar-card">
+        <mat-card-title>Prefixes</mat-card-title>
+        <mat-card-content>
+          <button
+            mat-stroked-button
+            color="primary"
+            class="sidebar-button"
+            (click)="insertAllPrefixes()"
+            [disabled]="!prefixes.length"
+          >
+            Insert All Prefixes
+          </button>
+          <div class="prefix-list">
+            <button
+              mat-button
+              class="prefix-item"
+              *ngFor="let p of prefixes"
+              (click)="insertPrefix(p)"
+              [title]="p.prefix + ': <' + p.uri + '>'"
+            >
+              {{ p.prefix }}
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </aside>
+
+    <section class="editor-main">
+      <div class="editor-panel">
+        <ngx-monaco-editor
+          [options]="editorOptions"
+          [(ngModel)]="query"
+          class="editor"
+        ></ngx-monaco-editor>
+      </div>
+      <div class="editor-actions">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="execute()"
+          [disabled]="loading || !query"
         >
-          {{ q }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+          Execute
+        </button>
+        <mat-form-field class="history-field">
+          <mat-label>Query History</mat-label>
+          <mat-select [(value)]="selectedHistory">
+            <mat-option *ngFor="let q of state.history" [value]="q">
+              {{ q }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button
+          mat-stroked-button
+          color="primary"
+          (click)="loadHistory()"
+          [disabled]="!selectedHistory"
+        >
+          Load
+        </button>
+        <span class="status" *ngIf="loading">Running…</span>
+      </div>
+      <div *ngIf="error" class="error">{{ error }}</div>
+    </section>
   </div>
-  <span *ngIf="loading">Running...</span>
-  <div *ngIf="error" style="color: red">{{ error }}</div>
 </div>
+
 <div class="query-editor-container">
   <app-query-results></app-query-results>
 </div>

@@ -48,6 +48,20 @@ export class SearchComponent implements OnInit {
     return result;
   }
 
+  displayLabel(result: any): string {
+    if (result?.iri) {
+      return this.prefixIt(result.iri);
+    }
+    return "Untitled entity";
+  }
+
+  displayIri(result: any): string {
+    if (!result?.iri) {
+      return "Unknown IRI";
+    }
+    return result.iri;
+  }
+
   performSearch(q: string) {
     if (!q) {
       this.results = [];

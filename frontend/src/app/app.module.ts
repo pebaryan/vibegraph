@@ -17,6 +17,9 @@ import { MatOptionModule } from "@angular/material/core";
 import { MatTableModule } from "@angular/material/table";
 import { MatCardModule } from "@angular/material/card";
 import { MatSelectModule } from "@angular/material/select";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatTabsModule } from "@angular/material/tabs";
 
 import { MonacoEditorModule } from "ngx-monaco-editor-v2";
 import { MomentModule } from 'ngx-moment';
@@ -34,6 +37,8 @@ import { LandingHomeComponent } from '@app/components/landing-home/landing-home.
 import { SearchComponent } from '@app/components/search/search.component';
 import { SettingsComponent } from '@app/components/settings/settings.component';
 import { PrefixDialogComponent } from "./components/prefix-dialog/prefix-dialog.component";
+import { ConfirmDialogComponent } from "./components/confirm-dialog/confirm-dialog.component";
+import { SnackbarComponent } from "./components/snackbar/snackbar.component";
 
 const routes: Routes = [
   { path: '', component: LandingHomeComponent },
@@ -50,6 +55,7 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
+    AddTripleComponent,
     QueryEditorComponent,
     GraphViewComponent,
     GraphNavigationComponent,
@@ -58,6 +64,8 @@ const routes: Routes = [
     GraphListComponent,
     GraphDialogComponent,
     PrefixDialogComponent,
+    ConfirmDialogComponent,
+    SnackbarComponent,
     LandingHomeComponent,
     SearchComponent,
     SettingsComponent
@@ -82,6 +90,9 @@ const routes: Routes = [
     MatTableModule,
     MatCardModule,
     MatSelectModule,
+    MatCheckboxModule,
+    MatAutocompleteModule,
+    MatTabsModule,
     MonacoEditorModule.forRoot(),
     MomentModule,
   ],

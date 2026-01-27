@@ -1,15 +1,32 @@
 <div class="add-triple-form" [formGroup]="tripleForm">
   <mat-form-field>
     <mat-label>Subject</mat-label>
-    <input matInput formControlName="subject" />
+    <input matInput formControlName="subject" [matAutocomplete]="subjectAuto" />
+    <mat-autocomplete #subjectAuto="matAutocomplete">
+      <mat-option *ngFor="let opt of subjectOptions$ | async" [value]="opt.value">
+        <div class="option-label">{{ opt.label }}</div>
+        <div class="option-sub" *ngIf="opt.sub">{{ opt.sub }}</div>
+      </mat-option>
+    </mat-autocomplete>
   </mat-form-field>
   <mat-form-field>
     <mat-label>Predicate</mat-label>
-    <input matInput formControlName="predicate" />
+    <input matInput formControlName="predicate" [matAutocomplete]="predicateAuto" />
+    <mat-autocomplete #predicateAuto="matAutocomplete">
+      <mat-option *ngFor="let opt of filteredPredicateOptions$ | async" [value]="opt">
+        {{ opt }}
+      </mat-option>
+    </mat-autocomplete>
   </mat-form-field>
   <mat-form-field>
     <mat-label>Object</mat-label>
-    <input matInput formControlName="object" />
+    <input matInput formControlName="object" [matAutocomplete]="objectAuto" />
+    <mat-autocomplete #objectAuto="matAutocomplete">
+      <mat-option *ngFor="let opt of objectOptions$ | async" [value]="opt.value">
+        <div class="option-label">{{ opt.label }}</div>
+        <div class="option-sub" *ngIf="opt.sub">{{ opt.sub }}</div>
+      </mat-option>
+    </mat-autocomplete>
   </mat-form-field>
   <div>
     <button [disabled]="!tripleForm.valid" mat-raised-button color="primary" (click)="addTriple()">

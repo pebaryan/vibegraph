@@ -90,6 +90,31 @@ paths:
       responses:
         '200':
           description: Uploaded
+  /api/graphs/{graph_id}/triples/delete:
+    post:
+      summary: Delete a triple from a graph
+      parameters:
+        - in: path
+          name: graph_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subject:
+                  type: string
+                predicate:
+                  type: string
+                object:
+                  type: string
+      responses:
+        '200':
+          description: Deleted
   /api/queries:
     post:
       summary: Execute SPARQL query
@@ -107,6 +132,123 @@ paths:
       responses:
         '200':
           description: Query result
+  /sparql:
+    get:
+      summary: SPARQL protocol endpoint (proxy)
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: graph_id
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: SPARQL query result
+        '400':
+          description: Invalid query
+    post:
+      summary: SPARQL protocol endpoint (proxy)
+      requestBody:
+        required: true
+        content:
+          application/sparql-query:
+            schema:
+              type: string
+          application/sparql-update:
+            schema:
+              type: string
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                update:
+                  type: string
+                graph_id:
+                  type: string
+      responses:
+        '200':
+          description: SPARQL query result
+        '204':
+          description: SPARQL update applied
+        '400':
+          description: Invalid request
+  /sparql/query:
+    get:
+      summary: SPARQL read endpoint (SELECT/ASK/CONSTRUCT/DESCRIBE)
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: graph_id
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: SPARQL query result
+        '400':
+          description: Invalid query
+    post:
+      summary: SPARQL read endpoint (SELECT/ASK/CONSTRUCT/DESCRIBE)
+      requestBody:
+        required: true
+        content:
+          application/sparql-query:
+            schema:
+              type: string
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                graph_id:
+                  type: string
+      responses:
+        '200':
+          description: SPARQL query result
+        '400':
+          description: Invalid query
+  /sparql/update:
+    post:
+      summary: SPARQL update endpoint (INSERT/DELETE/etc)
+      requestBody:
+        required: true
+        content:
+          application/sparql-update:
+            schema:
+              type: string
+          application/json:
+            schema:
+              type: object
+              properties:
+                update:
+                  type: string
+                query:
+                  type: string
+                graph_id:
+                  type: string
+      responses:
+        '204':
+          description: SPARQL update applied
+        '400':
+          description: Invalid update
+  /sparql/info:
+    get:
+      summary: SPARQL endpoint capabilities
+      responses:
+        '200':
+          description: Endpoint metadata
   /api/queries/history:
     get:
       summary: Get query history
@@ -136,6 +278,23 @@ paths:
       responses:
         '200':
           description: Re-indexed
+  /api/graphs/clear:
+    post:
+      summary: Clear all graphs and related data
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clear_history:
+                  type: boolean
+                clear_index:
+                  type: boolean
+      responses:
+        '200':
+          description: Cleared
   /api/queries/history/{graph_id}:
     get:
       summary: Retrieve query history for a graph

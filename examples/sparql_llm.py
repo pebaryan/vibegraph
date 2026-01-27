@@ -108,8 +108,10 @@ def get_sparql_query(user_question, available_prefixes=None):
         # Extract text from the response
         raw_text = response.choices[0].message.content
 
+        print(f"raw response : --\n{raw_text}\n--\n")
+
         # Clean the text: remove markdown code blocks if present
-        clean_text = re.sub(r"```sparql|```sql|```", "", raw_text).strip()
+        clean_text = re.sub(r"```sparql|```sql|```", "", raw_text).replace('</|assistant|>', '').strip()
 
         return clean_text
 
@@ -178,10 +180,10 @@ def explain_results(results, user_question):
         results_preview = json.dumps(results, indent=2)
 
     system_prompt = """
-    You are a helpful data analyst assistant. 
+    You are a helpful SPARQL data analyst assistant. 
     The user asked: "{question}"
     
-    Here are the raw results from the database:
+    Here are the raw results from the triple store:
     {results}
     
     Please explain these results to the user in simple, human-readable language.
@@ -534,7 +536,7 @@ if __name__ == "__main__":
     sparql_query = get_sparql_query(user_input, NS_PREFIXES)
 
     if sparql_query:
-        print(f"Generated SPARQL:\n{sparql_query}\n")
+        print(f"Generated SPARQL:\n'{sparql_query}'\n")
 
         # Step 2: Execute SPARQL
         raw_results = execute_sparql(sparql_query)
@@ -544,23 +546,27 @@ if __name__ == "__main__":
             formatted = format_results(raw_results)
             print(formatted)
 
-            # Step 3: Explain Results
-            explanation = explain_results(raw_results, user_input)
+            if raw_results.get("count", 0) > 0:
+                # Step 3: Explain Results
+                explanation = explain_results(raw_results, user_input)
 
-            print("\n--- AI Explanation ---")
-            print(explanation)
+                print("\n--- AI Explanation ---")
+                print(explanation)
+            else:
+                print("\n I have no information about the content in the graph")
+                
         else:
             print("Failed to execute SPARQL query.")
     else:
         print("Failed to generate SPARQL query.")
 
-    print("\n--- Testing Agentic Workflow ---")
-    user_input2 = "Find entities related to food"
-    print(f"User: {user_input2}\n")
+    # print("\n--- Testing Agentic Workflow ---")
+    # user_input2 = "Find entities related to food"
+    # print(f"User: {user_input2}\n")
 
-    agentic_result = run_agentic_workflow(user_input2)
-    if agentic_result and agentic_result["status"] == "success":
-        formatted = format_results(agentic_result["data"])
-        print(formatted)
-    else:
-        print("Agentic workflow failed.")
+    # agentic_result = run_agentic_workflow(user_input2)
+    # if agentic_result and agentic_result["status"] == "success":
+    #     formatted = format_results(agentic_result["data"])
+    #     print(formatted)
+    # else:
+    #     print("Agentic workflow failed.")

@@ -5,7 +5,7 @@ from routes.search import search_bp
 from routes.queries import query_bp
 from routes.graphs import graph_bp
 from routes.prefixes import prefixes_bp
-from routes.sparql_enhanced import sparql_bp
+from routes.sparql import sparql_bp
 
 # Initialize Flask application
 app = Flask(__name__)

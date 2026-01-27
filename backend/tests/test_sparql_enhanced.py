@@ -31,6 +31,10 @@ class TestEnhancedSPARQL(unittest.TestCase):
             # Test SELECT query
             select_query = "SELECT ?s ?p ?o WHERE { ?s ?p ?o }"
             self.assertEqual(get_query_type(select_query), "SELECT")
+
+            # Test PREFIX with SELECT
+            prefixed_query = "PREFIX ex: <http://example.org/> SELECT ?s WHERE { ?s ?p ?o }"
+            self.assertEqual(get_query_type(prefixed_query), "SELECT")
             
             # Test INSERT query
             insert_query = "INSERT DATA { <http://example.org/subject> <http://example.org/predicate> <http://example.org/object> }"

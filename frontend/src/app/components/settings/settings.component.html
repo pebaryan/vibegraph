@@ -9,9 +9,31 @@
   >
     {{ loading ? "Re‑indexing…" : "Re‑index All Graphs" }}
   </button>
+  <button
+    mat-raised-button
+    color="warn"
+    class="danger-button"
+    (click)="clearAllGraphs()"
+    [disabled]="clearing"
+  >
+    {{ clearing ? "Clearing…" : "Clear All Graphs" }}
+  </button>
   <div>
     <a href="://localhost:5000/api-docs" target="_blank">Open API Docs</a>
   </div>
+  <h3>Predicate Priority (Graph Navigation)</h3>
+  <mat-form-field appearance="fill" style="width: 100%">
+    <mat-label>Prefix order</mat-label>
+    <input
+      matInput
+      [formControl]="predicatePriorityCtrl"
+      placeholder="rdf,rdfs,owl"
+    />
+    <mat-hint>Comma-separated prefixes or full URI prefixes.</mat-hint>
+  </mat-form-field>
+  <button mat-button color="primary" (click)="savePredicatePriority()">
+    Save Predicate Priority
+  </button>
   <h3>Known Namespace Prefixes</h3>
   <button mat-button color="primary" (click)="addPrefix()">Add Prefix</button>
   <table

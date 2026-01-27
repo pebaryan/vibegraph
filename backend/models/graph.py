@@ -8,6 +8,8 @@ from rdflib import RDF, RDFS, OWL
 
 # Import configuration
 from config import GRAPHS_DATA_DIR, GRAPH_DATA_FILE
+from config import QUERY_HISTORY_DIR
+import shutil
 
 # Global namespace prefixes loaded from nsprefixes.json
 import json
@@ -124,6 +126,10 @@ class Graph:
         defaultNs = Namespace("http://vibe.graph/default/")
         prefixes = NS_PREFIXES
         if pos in ("s", "o"):
+            if pos == "o":
+                literal = self._parse_literal(value, prefixes)
+                if literal is not None:
+                    return literal
             if value.startswith("_:"):
                 return BNode(value[2:])
             elif "://" in value:
@@ -165,6 +171,37 @@ class Graph:
             )
             numtris += 1
         print(f"indexed {numtris} triples")
+
+    def _parse_literal(self, value: str, prefixes):
+        """Parse a typed or language-tagged literal using a quoted form."""
+        raw = value.strip()
+        if not raw.startswith('"'):
+            return None
+        if raw.endswith('"'):
+            return Literal(raw[1:-1])
+        # "value"@en
+        if '"@' in raw:
+            base, lang = raw.rsplit('"@', 1)
+            if base.startswith('"') and lang:
+                return Literal(base[1:], lang=lang)
+        # "value"^^datatype
+        if '"^^' in raw:
+            base, dtype = raw.rsplit('"^^', 1)
+            if base.startswith('"') and dtype:
+                datatype = self._resolve_datatype(dtype.strip(), prefixes)
+                return Literal(base[1:], datatype=datatype)
+        return None
+
+    def _resolve_datatype(self, dtype: str, prefixes):
+        if dtype.startswith("<") and dtype.endswith(">"):
+            return URIRef(dtype[1:-1])
+        if "://" in dtype:
+            return URIRef(dtype)
+        if ":" in dtype:
+            prefix, local = dtype.split(":", 1)
+            if prefix in prefixes:
+                return prefixes[prefix][local]
+        return URIRef(dtype)
 
     @staticmethod
     def load_from_file(
@@ -335,6 +372,42 @@ class GraphManager:
             self._save()
             return True
         return False
+
+    def remove_triple(self, graph_id, triple):
+        if graph_id in self.graphs:
+            graph_obj = self.get_graph_object(graph_id)
+            wrapped = (
+                graph_obj.wrap(triple[0], "s", prefixNS=self.prefixes),
+                graph_obj.wrap(triple[1], "p", prefixNS=self.prefixes),
+                graph_obj.wrap(triple[2], "o", prefixNS=self.prefixes),
+            )
+            graph_obj.graph.remove(wrapped)
+            self._save()
+            return True
+        return False
+
+    def clear_all(self, clear_history=True):
+        """Remove all graphs and associated data from storage."""
+        self.graphs = {}
+        self.graph_objs = {}
+
+        # Remove graph data files
+        if os.path.isdir(GRAPHS_DATA_DIR):
+            for fname in os.listdir(GRAPHS_DATA_DIR):
+                file_path = os.path.join(GRAPHS_DATA_DIR, fname)
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+        # Reset metadata file
+        if os.path.exists(GRAPH_DATA_FILE):
+            with open(GRAPH_DATA_FILE, "w", encoding="utf-8") as f:
+                json.dump({}, f, indent=2)
+
+        # Optionally clear query history
+        if clear_history:
+            shutil.rmtree(QUERY_HISTORY_DIR, ignore_errors=True)
+            os.makedirs(QUERY_HISTORY_DIR, exist_ok=True)
+
+        self._save()
 
     def update_graph(self, graph_id, name=None):
         """Update the name of an existing graph"""

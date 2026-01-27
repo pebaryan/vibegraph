@@ -25,7 +25,7 @@ def run_test(query: str = SAMPLE_QUERY) -> None:
         SPARQL query string. Defaults to SAMPLE_QUERY.
     """
     sparql = SPARQLWrapper(SPARQL_ENDPOINT, returnFormat=JSON)
-
+    print(sparql)
     try:
         sparql.setQuery(query)
         results = sparql.query().convert()
@@ -35,10 +35,9 @@ def run_test(query: str = SAMPLE_QUERY) -> None:
         print(f"Variables: {results.get('vars', [])}")
         print(f"Graph ID: {results.get('graph_id', 'N/A')}")
         print("\n--- Query Execution Successful ---")
-    except Exception as exc:  # noqa: BLE001 (broad exception for external service)
+    except Exception as exc:
         print(f"Error executing SPARQL query: {exc}")
 
 
 if __name__ == "__main__":
     run_test()
-""

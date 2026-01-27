@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { GraphService, Graph } from '@app/services/graph.service';
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { Router } from '@angular/router';
 
 @Component({
@@ -38,15 +39,10 @@ export class GraphListComponent implements OnInit {
       data: { mode: 'create' }
     });
 
-    dialogRef.afterClosed().subscribe((name) => {
-      if (name) {
-        this.graphService.createGraph(name).subscribe({
-          next: () => {
-            this.showMessage('Graph created');
-            this.loadGraphs();
-          },
-          error: (err) => this.showError(err)
-        });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.showMessage('Graph created');
+        this.loadGraphs();
       }
     });
   }
@@ -71,13 +67,27 @@ export class GraphListComponent implements OnInit {
   }
 
   deleteGraph(graph: Graph): void {
-    if (!confirm(`Delete graph '${graph.name}'?`)) return;
-    this.graphService.deleteGraph(graph.graph_id).subscribe({
-      next: () => {
-        this.showMessage('Graph deleted');
-        this.loadGraphs();
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '420px',
+      data: {
+        title: 'Delete graph',
+        message: `Delete graph '${graph.name}'? This cannot be undone.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
       },
-      error: (err) => this.showError(err)
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (!confirmed) {
+        return;
+      }
+      this.graphService.deleteGraph(graph.graph_id).subscribe({
+        next: () => {
+          this.showMessage('Graph deleted');
+          this.loadGraphs();
+        },
+        error: (err) => this.showError(err)
+      });
     });
   }
 
@@ -90,10 +100,12 @@ export class GraphListComponent implements OnInit {
   }
 
   private showMessage(msg: string): void {
-    this.snackBar.open(msg, 'Close', { duration: 3000 });
+    const ref = this.snackBar.open(msg, 'Close', { duration: 3000 });
+    ref.onAction().subscribe(() => ref.dismiss());
   }
 
   private showError(err: any): void {
-    this.snackBar.open(`Error: ${err}`, 'Close', { duration: 5000 });
+    const ref = this.snackBar.open(`Error: ${err}`, 'Close', { duration: 5000 });
+    ref.onAction().subscribe(() => ref.dismiss());
   }
 }

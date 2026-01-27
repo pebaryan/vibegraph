@@ -1,50 +1,182 @@
 <div class="graph-nav-container">
-  <h2>{{ focusValue ? prefixIt(focusValue) : focus }}</h2>
-  <h5>
-    <a
-      [routerLink]="['/graph-navigation']"
-      [queryParams]="{ id: graphId, focusValue: focusValue }"
-      >{{ focusValue }}</a
-    >
-  </h5>
-  <br />
-  <div>
-    <button mat-flat-button (click)="fetchClasses()">All Classes</button>
-    <button mat-flat-button (click)="fetchTriplesLimited()">
+  <mat-card class="header-card">
+    <div class="header-content">
+      <div>
+        <div class="header-title">
+          {{ focusValue ? prefixIt(focusValue) : focus }}
+        </div>
+        <div class="header-sub">
+          <a
+            [routerLink]="['/graph-navigation']"
+            [queryParams]="{ id: graphId, focusValue: focusValue }"
+            >{{ focusValue || "All entities" }}</a
+          >
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="graph-badge">Graph: {{ graphId }}</span>
+      </div>
+    </div>
+  </mat-card>
+
+  <div class="toolbar">
+    <button mat-flat-button color="primary" (click)="fetchClasses()">
+      All Classes
+    </button>
+    <button mat-flat-button color="primary" (click)="fetchTriplesLimited()">
       Preview Triples
     </button>
-  </div>
-  <table
-    mat-table
-    [dataSource]="dataSource"
-    class="mat-elevation-z8"
-    *ngIf="displayedColumns.length > 0"
-  >
-    <ng-container
-      *ngFor="let column of displayedColumns"
-      [matColumnDef]="column"
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="clearFocus()"
+      [disabled]="!focusValue"
     >
-      <th mat-header-cell *matHeaderCellDef>{{ column }}</th>
-      <td
-        mat-cell
-        *matCellDef="let element"
-        (click)="selectEntity(column, element[column], $event)"
-      >
-        {{ prefixIt(element[column]) }}
-      </td>
-    </ng-container>
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-  </table>
-  <p *ngIf="!displayedColumns.length">No results to display.</p>
+      Clear Focus
+    </button>
+  </div>
 
-  <!-- <div *ngIf="selectedEntity">
-    <h3>Selected Entity Details</h3>
-    <pre>{{ selectedEntity | json }}</pre>
-  </div> -->
-  <br />
-  <mat-card>
-    <mat-card-title>Add Triple</mat-card-title>
-    <app-add-triple [graphId]="graphId" (tripleAdded)="loadFocus()"></app-add-triple>
-  </mat-card>
+  <div class="layout">
+    <section class="results">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter results</mat-label>
+        <input
+          matInput
+          [value]="filterValue"
+          (input)="applyFilter($event.target.value)"
+          placeholder="Type to filter rows"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          *ngIf="filterValue"
+          (click)="applyFilter('')"
+          aria-label="Clear filter"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <table
+        mat-table
+        [dataSource]="dataSource"
+        class="mat-elevation-z8 result-table"
+        *ngIf="displayedColumns.length > 0"
+      >
+        <ng-container
+          *ngFor="let column of displayedColumns"
+          [matColumnDef]="column"
+        >
+          <th mat-header-cell *matHeaderCellDef>{{ column }}</th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            (click)="column !== 'actions' && selectEntity(column, element[column], $event)"
+            class="cell-value"
+            [class.focused-cell]="column !== 'actions' && isFocusedCell(element[column])"
+          >
+            <ng-container *ngIf="column !== 'actions'; else actionsCell">
+              <span [class.literal]="column === 'object' && isLiteral(element[column])">
+                {{ displayValue(column, element[column]) }}
+              </span>
+            </ng-container>
+            <ng-template #actionsCell>
+              <button
+                mat-icon-button
+                color="warn"
+                aria-label="Delete triple"
+                (click)="deleteTriple(element); $event.stopPropagation()"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </ng-template>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+      <mat-card *ngIf="!displayedColumns.length" class="empty-card">
+        <mat-card-title>No results to display</mat-card-title>
+        <mat-card-content>
+          Try “Preview Triples” or select a class to explore entities.
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+    <aside class="side-panel">
+      <mat-card *ngIf="selectedEntity" class="selected-card">
+        <mat-card-title>Selected Entity</mat-card-title>
+        <mat-card-content>
+          <div class="selected-row">
+            <span class="label">Type</span>
+            <span class="value">{{ selectedEntity.type }}</span>
+          </div>
+          <div class="selected-row">
+            <span class="label">Value</span>
+            <span class="value">{{ prefixIt(selectedEntity.entity) }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="label-card" *ngIf="focusValue">
+        <mat-card-title>Add Label</mat-card-title>
+        <mat-card-content>
+          <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>rdfs:label</mat-label>
+            <input matInput [formControl]="labelCtrl" [disabled]="!focusValue || savingLabel" />
+          </mat-form-field>
+          <div class="label-advanced">
+            <mat-checkbox
+              [formControl]="useLangCtrl"
+              (change)="toggleLang($event.checked)"
+              [disabled]="!focusValue || savingLabel"
+            >
+              Language tag
+            </mat-checkbox>
+            <mat-form-field appearance="fill">
+              <mat-label>e.g. en</mat-label>
+              <input
+                matInput
+                [formControl]="langCtrl"
+                [disabled]="!useLangCtrl.value || savingLabel"
+              />
+            </mat-form-field>
+          </div>
+          <div class="label-advanced">
+            <mat-checkbox
+              [formControl]="useDatatypeCtrl"
+              (change)="toggleDatatype($event.checked)"
+              [disabled]="!focusValue || savingLabel"
+            >
+              Datatype
+            </mat-checkbox>
+            <mat-form-field appearance="fill">
+              <mat-label>e.g. xsd:string</mat-label>
+              <input
+                matInput
+                [formControl]="datatypeCtrl"
+                [disabled]="!useDatatypeCtrl.value || savingLabel"
+              />
+            </mat-form-field>
+          </div>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="addLabel()"
+            [disabled]="!focusValue || savingLabel"
+          >
+            {{ savingLabel ? "Saving…" : "Add Label" }}
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="add-card">
+        <mat-card-title>Add Triple</mat-card-title>
+        <app-add-triple
+          [graphId]="graphId"
+          (tripleAdded)="loadFocus()"
+        ></app-add-triple>
+      </mat-card>
+    </aside>
+  </div>
 </div>

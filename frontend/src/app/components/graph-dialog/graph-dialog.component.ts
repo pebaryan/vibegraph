@@ -3,6 +3,7 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { GraphService } from '../../services/graph.service';
 import { FormBuilder, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface GraphDialogData {
   mode: 'create' | 'edit';
@@ -33,6 +34,7 @@ export class GraphDialogComponent {
   constructor(
     private fb: FormBuilder,
     private graphService: GraphService,
+    private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<GraphDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: GraphDialogData
   ) {
@@ -54,8 +56,8 @@ export class GraphDialogComponent {
       rdf: 'xml',
       xml: 'xml',
       owl: 'xml',
-      jsonld: 'jsonld',
-      json: 'jsonld',
+      jsonld: 'json-ld',
+      json: 'json-ld',
     };
     return mapping[ext ?? ''] ?? 'ttl';
   }
@@ -70,7 +72,7 @@ export class GraphDialogComponent {
     this.nameForm.patchValue({ guessedFormat: guessed, format: guessed });
     // expose supported formats for radio group
     this.nameForm.patchValue({
-      availableFormats: ['ttl', 'trig', 'nt', 'xml', 'jsonld'],
+      availableFormats: ['ttl', 'trig', 'nt', 'xml', 'json-ld'],
     });
   }
 
@@ -97,19 +99,33 @@ export class GraphDialogComponent {
 
 
     if (this.data.mode === 'create') {
-      this.graphService.createGraph(payload).subscribe((res: any) => {
-        if (form.dataSource === 'file' && this.nameForm.get('file')?.value) {
-          const format = this.nameForm.get('format')?.value;
-          this.graphService.uploadGraphFile(res.graph_id, this.nameForm.get('file')?.value as File, format).subscribe(() => {
+      this.graphService.createGraph(payload).subscribe({
+        next: (res: any) => {
+          if (form.dataSource === 'file' && this.nameForm.get('file')?.value) {
+            const format = this.nameForm.get('format')?.value;
+            this.graphService
+              .uploadGraphFile(res.graph_id, this.nameForm.get('file')?.value as File, format)
+              .subscribe({
+                next: () => this.dialogRef.close(res),
+                error: () => {
+                  const ref = this.snackBar.open('Upload failed. Please check the file format.', 'Dismiss', {
+                    duration: 5000,
+                  });
+                  ref.onAction().subscribe(() => ref.dismiss());
+                },
+              });
+          } else {
             this.dialogRef.close(res);
-          });
-        } else {
-          this.dialogRef.close(res);
-        }
+          }
+        },
+        error: () => {
+          const ref = this.snackBar.open('Failed to create graph.', 'Dismiss', { duration: 5000 });
+          ref.onAction().subscribe(() => ref.dismiss());
+        },
       });
     } else {
       // For edit mode, simply close with updated values for now
-      this.dialogRef.close(this.nameForm.value);
+      this.dialogRef.close(this.nameForm.get("name")?.value);
     }
   }
 

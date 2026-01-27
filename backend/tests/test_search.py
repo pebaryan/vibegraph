@@ -294,7 +294,7 @@ class TestWhooshSearchEngine:
         self.search_engine.add_entity(entity)
 
         # Search for partial term
-        results = self.search_engine.search("Partial", search_by="label")
+        results = self.search_engine.search("Part", search_by="label")
         assert results["count"] >= 1
 
     def test_get_results_index_error(self):

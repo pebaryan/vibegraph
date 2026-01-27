@@ -16,6 +16,13 @@ export class QueryService extends BaseService {
     return this.http.post<any>(this.baseUrl, { query });
   }
 
+  executeSparql(query: string, accept: string): Observable<any> {
+    return this.http.post<any>(`${this.apiHost}/sparql/query`, query, {
+      headers: { Accept: accept, "Content-Type": "application/sparql-query" },
+      responseType: "text" as "json",
+    });
+  }
+
   getHistory(graph_id: string): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/${graph_id}`);
   }

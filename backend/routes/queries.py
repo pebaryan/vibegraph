@@ -29,6 +29,9 @@ def execute_query():
 
     if not query:
         return jsonify({"error": "Query is required"}), 400
+    if not isinstance(query, str):
+        return jsonify({"error": "Query must be a string"}), 400
+    query = " ".join(query.split())
     if not graph_id:
         graphs = graph_manager.list_graphs()
         if len(graphs) == 0:
@@ -81,7 +84,6 @@ def execute_query():
         return jsonify(response), 200
     except Exception as e:
         print(e)
-        e.printStackTrace()
         return jsonify({"error": str(e)}), 400
 
 

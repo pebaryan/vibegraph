@@ -5,6 +5,7 @@ from whoosh.analysis import StandardAnalyzer
 import os
 import json
 import uuid
+import re
 
 # Whoosh Search Model
 
@@ -61,9 +62,10 @@ class WhooshSearchEngine:
         if not self.index:
             return {"error": "Index not created"}
 
-        # Parse the query
+        # Parse the query (allow prefix matching for partial terms)
         parser = QueryParser(search_by, schema=self.index.schema)
-        query_obj = parser.parse(query)
+        expanded_query = self._expand_prefix_query(query)
+        query_obj = parser.parse(expanded_query)
 
         # Execute the search
         with self.index.searcher() as searcher:
@@ -86,3 +88,22 @@ class WhooshSearchEngine:
                 "results": formatted_results,
                 "count": len(formatted_results),
             }
+
+    def _expand_prefix_query(self, query):
+        """Append wildcard to terms to enable prefix matches unless query uses advanced syntax."""
+        if not query:
+            return query
+        tokens = re.findall(r'"[^"]+"|\S+', query)
+        expanded = []
+        for token in tokens:
+            if token.startswith('"') and token.endswith('"'):
+                expanded.append(token)
+                continue
+            if any(ch in token for ch in ["*", "?", ":", "^", "~", "[", "]", "{", "}", "\\", "/"]):
+                expanded.append(token)
+                continue
+            if token.isdigit():
+                expanded.append(token)
+                continue
+            expanded.append(f"{token}*")
+        return " ".join(expanded)

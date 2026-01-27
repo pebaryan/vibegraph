@@ -1,5 +1,6 @@
 flask
 flask-cors
-rdflib
+rdflib>=6.3.2
+pyparsing>=3.0.9,<3.3
 whoosh
 flasgger==0.9.7.1

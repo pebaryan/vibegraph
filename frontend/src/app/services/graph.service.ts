@@ -32,7 +32,7 @@ export class GraphService extends BaseService {
   }
 
   listGraphs(): Observable<Graph[]> {
-    return this.http.get<{ graphs: Graph[] }>(this.baseUrl);
+    return this.http.get<Graph[]>(this.baseUrl);
   }
 
   getTriples(graphId: string): Observable<TripleResult> {
@@ -41,6 +41,10 @@ export class GraphService extends BaseService {
 
   createTriple(graphId: string, triple: Triple): Observable<any> {
     return this.http.post(`${this.baseUrl}/${graphId}/triples`, triple);
+  }
+
+  deleteTriple(graphId: string, triple: Triple): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${graphId}/triples/delete`, triple);
   }
 
   /**
@@ -65,6 +69,13 @@ export class GraphService extends BaseService {
    */
   reindexAll(): Observable<any> {
     return this.http.post(`${this.baseUrl}/reindex`, {});
+  }
+
+  /**
+   * Clear all graphs, optionally clearing history and search index.
+   */
+  clearAll(options?: { clear_history?: boolean; clear_index?: boolean }): Observable<any> {
+    return this.http.post(`${this.baseUrl}/clear`, options ?? {});
   }
 
   /**

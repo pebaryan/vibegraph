@@ -1,0 +1,18 @@
+pre {
+  background: #f7f7f7;
+  padding: 12px;
+  border-radius: 4px;
+  overflow: auto;
+}
+
+.results-actions {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.export-field {
+  min-width: 180px;
+}

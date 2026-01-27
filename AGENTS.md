@@ -1,130 +1,94 @@
 # AGENTS.md
 
+This file is for automated agents working in this repo. Keep it accurate.
+
+## Project Overview
+- Backend: Flask + RDFLib (SPARQL endpoints, graph storage, search).
+- Frontend: Angular app with SPARQL query editor.
+- Data is persisted under `backend/data/` and query history under `backend/query_history/`.
+
+## Repo Layout
+- `backend/` Flask API, RDFLib graph management, SPARQL protocol endpoints.
+- `frontend/` Angular UI.
+- `examples/` SPARQL client scripts.
+- `tests/` (backend tests live in `backend/tests/`).
+
+## How to Run
+### Backend
+```
+# From repo root
+pip install -r backend/requirements.txt
+python backend/app.py
+```
+Backend listens on `http://localhost:5000`.
+
+### Frontend
+```
+cd frontend
+npm install
+npm start
+```
+Frontend listens on `http://localhost:4200`.
+
 ## Build
-
 | Command | Description |
 |---------|-------------|
-| `npm run build` / `ng build` | Build the Angular application using the default configuration (development). |
-| `ng build --configuration=production` | Build a production bundle with optimizations, source maps disabled, and hashed filenames. |
-| `npm start` / `ng serve` | Start the development server with live reload and HMR. |
-| `ng serve --configuration=production` | Serve a production‑ready build locally. |
-
-## Backend
-
-| Command | Description |
-|---------|-------------|
-| `pip install -r backend/requirements.txt` | Install backend dependencies |
-| `python backend/app.py` | Run the Flask backend locally |
-| `flake8 backend/` | Lint backend Python code |
-| `pytest` | Run backend tests (if any) |
-| `open http://localhost:5000/apidocs/` | Swagger UI for API docs |
+| `npm run build` / `ng build` | Build Angular app (dev). |
+| `ng build --configuration=production` | Production build. |
+| `npm start` / `ng serve` | Dev server with live reload. |
+| `ng serve --configuration=production` | Serve production build locally. |
 
 ## Lint
-
-The repository does not expose a dedicated `lint` npm script, but Angular’s built‑in TSLint/ESLint integration is available.
-
 ```
-# Run the default linter across the entire project
 ng lint
-```
-
-**Targeted linting**
-
-```
-# Lint a single file2011ready build locally. |
-
-## Lint
-
-The repository does not expose a dedicated `lint` npm script, but Angular’s built‑in TSLint/ESLint integration is available.
-
-```
-# Run the default linter across the entire project
-ng lint
-```
-
-**Targeted linting**
-
-```
-# Lint a single file
 ng lint --files=src/app/app.component.ts
-
-# Lint all files in a folder
 ng lint --files=src/app/**
-```
 
-**Running ESLint directly**
-
-```
 npx eslint .
 ```
 
 ## Tests
-
-Angular uses Jasmine/Karma.
-
+Backend (pytest):
 ```
-# Run the entire test suite
+pytest
+```
+Frontend (Karma/Jasmine):
+```
 ng test
-```
-
-**Subset of tests**
-
-```
-# All specs in a folder
 ng test --include=src/app/**/component/**/*.spec.ts
-
-# Single spec file
 ng test --include=src/app/app.component.spec.ts
-
-# Single spec within a file (unique description)
 ng test --grep="should render title"
-```
-
-**Run once (CI)**
-
-```
 ng test --watch=false --browsers=ChromeHeadless
 ```
 
+## SPARQL Endpoints (Protocol)
+These are implemented in `backend/routes/sparql_enhanced.py` and proxied by `backend/routes/sparql.py`.
+- `/sparql` (GET/POST) proxy entry point.
+- `/sparql/query` (GET/POST) read queries.
+- `/sparql/update` (POST) updates.
+- `/sparql/info` (GET) capabilities.
+
+Content types supported:
+- `application/sparql-query` for read queries.
+- `application/sparql-update` for updates.
+- JSON and form-encoded `query`/`update` are accepted for app clients.
+
+## Graph Storage & Config
+- Graph metadata: `backend/data/graph_data.json`.
+- Turtle files: `backend/data/graphs_data/<graph_id>.ttl`.
+- Query history: `backend/query_history/<graph_id>/`.
+- Config: `backend/config.py`.
+
 ## Code Style Guidelines
+- TypeScript: prefer `readonly`, avoid `any`.
+- Angular imports: core -> third‑party -> local, alphabetical within groups.
+- Use `OnPush` where possible; prefer async pipe.
+- Python: keep error handling explicit; return JSON error payloads.
 
-| Topic | Guideline |
-|-------|-----------|
-| **Imports** | Core Angular imports first, third‑party next, then local modules. Alphabetical within each group. |
-| **Formatting** | Prettier with default Angular config. Run `npx prettier --write .`. |
-| **TypeScript** | Prefer `readonly` for immutable fields. Enable `strictNullChecks`. Avoid `any`; use `unknown` or proper interfaces. |
-| **Naming** | Components: `PascalCase` + `Component`. Services: `PascalCase` + `Service`. Variables: `camelCase`. Constants: `UPPER_SNAKE_CASE`. |
-| **Error handling** | Propagate via Observables or `async/await`. Do not swallow silently. Use `HttpErrorResponse` for HTTP errors. |
-| **Testing** | `.spec.ts` suffix. Use `TestBed` to configure modules. |
-| **Comments** | JSDoc for public APIs. Inline only for non‑trivial logic. |
-| **File structure** | Component files together (`component.ts`, `.html`, `.scss`). Services in `services/`. State in `state/`. |
-| **Angular best practices** | Use `ng generate` for new components/services/modules. |
-| **Observables** | Prefer `async` pipe in templates. |
-| **Change detection** | Use `OnPush` when possible. |
-| **RxJS** | Prefer `pipe`, `map`, `switchMap`, `catchError`. Avoid `any`. |
-| **Dependency injection** | Constructor injection; avoid `@Inject` unless necessary. |
-| **Environment** | Store in `src/environments/*.ts` and import via `environment`. |
-| **Angular Material** | Import modules individually. |
-| **Monaco editor** | Lazy load; keep instance in a service. |
-| **Security** | Sanitize user input; use `DomSanitizer`. |
-| **Accessibility** | Semantic HTML, ARIA, test with axe. |
-| **Testing utilities** | `ComponentFixture`, `DebugElement`. |
-
-## Cursor / Copilot Rules
-
-No custom cursor or Copilot rule files are present.
-
-## Additional Notes
-
-* Angular CLI watches files during `ng serve` and `ng test` in dev mode.
-* For CI: `ng lint --quiet` to fail on lint errors.
-* Prettier config in `.prettierrc` if present; otherwise default.
-* TypeScript 5.4.2 is used.
-* Environment values in `src/environments/`.
-* Use `ng test --watch=false` for CI.
-* For production builds: `ng build --configuration=production` then `ng lint --quiet`.
-* Generate new components with `ng generate component <name>`.
+## Notes for Agents
+- The SPARQL proxy in `backend/routes/sparql.py` should stay thin and call enhanced handlers.
+- If you update SPARQL parsing/serialization, update tests in `backend/tests/test_sparql*.py`.
+- Keep README and `backend/swagger.yaml` in sync with API changes.
 
 ---
-
-*This file is intended for agents that automate tasks in this repository. Keep it up to date as scripts and conventions change.*
+If anything here is wrong or incomplete, update this file along with the code change.

@@ -1,4 +1,5 @@
 import os
+import shutil
 from flask import Blueprint, jsonify, request
 from models.graph import GraphManager
 from routes.search import search_engine
@@ -35,7 +36,7 @@ def create_graph():
 @graph_bp.route("/api/graphs", methods=["GET"])
 def list_graphs():
     graphs = graph_manager.list_graphs()
-    return jsonify({"graphs": graphs})
+    return jsonify(graphs)
 
 
 # Get triples for a graph
@@ -60,6 +61,19 @@ def add_triple(graph_id):
         return jsonify({"error": str(e)}), 400
 
 
+@graph_bp.route("/api/graphs/<graph_id>/triples/delete", methods=["POST"])
+def delete_triple(graph_id):
+    data = request.get_json()
+    try:
+        if graph_manager.remove_triple(
+            graph_id, (data["subject"], data["predicate"], data["object"])
+        ):
+            return jsonify({"message": "triple removed"}), 200
+        return jsonify({"error": "Graph not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
 # Upload RDF file for a graph
 @graph_bp.route("/api/graphs/<graph_id>/upload", methods=["POST"])
 def upload_graph(graph_id):
@@ -80,7 +94,7 @@ def upload_graph(graph_id):
                 fmt = "trig"
             elif filename.endswith(".nt"):
                 fmt = "nt"
-            elif filename.endswith(".nt"):
+            elif filename.endswith(".nq") or filename.endswith(".nquads"):
                 fmt = "nquads"
             elif (
                 filename.endswith(".rdf")
@@ -92,7 +106,7 @@ def upload_graph(graph_id):
                 fmt = "turtle"  # default fallback
         graph_obj.graph.parse(file, format=fmt)
         graph_manager._save()
-        graph_manager.index_graph(graph_obj, search_engine)
+        graph_manager.index_graph(graph_id, search_engine)
         return jsonify({"message": "Graph uploaded"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
@@ -120,6 +134,31 @@ def reindex_all_graphs():
     try:
         count = graph_manager.reindex_all(search_engine)
         return jsonify({"message": f"Re‑indexed {count} graphs"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# Clear all graphs and associated data
+@graph_bp.route("/api/graphs/clear", methods=["POST"])
+def clear_all_graphs():
+    data = request.get_json(silent=True) or {}
+    clear_history = data.get("clear_history", True)
+    clear_index = data.get("clear_index", True)
+
+    try:
+        graph_manager.clear_all(clear_history=clear_history)
+
+        if clear_index:
+            shutil.rmtree(search_engine.path, ignore_errors=True)
+            search_engine.create_index()
+
+        return jsonify(
+            {
+                "message": "All graphs cleared",
+                "cleared_history": bool(clear_history),
+                "cleared_index": bool(clear_index),
+            }
+        ), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

@@ -2,3 +2,4 @@ venv
 vw
 search_index
 .coverage
+__pycache__

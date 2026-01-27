@@ -81,8 +81,7 @@ class TestGraphRoutes:
 
         assert response.status_code == 200
         data = json.loads(response.data)
-        assert "graphs" in data
-        assert isinstance(data["graphs"], list)
+        assert isinstance(data, list)
 
     def test_get_triples_success(self):
         """Test getting triples for existing graph"""
@@ -157,9 +156,8 @@ class TestGraphRoutes:
 
         assert response.status_code == 200
         data = json.loads(response.data)
-        assert "graphs" in data
-        assert len(data["graphs"]) >= 1
-        assert any(g["name"] == "Existing Graph" for g in data["graphs"])
+        assert len(data) >= 1
+        assert any(g["name"] == "Existing Graph" for g in data)
 
     def test_create_graph_with_optional_params(self):
         """Test graph creation with various optional parameters"""
@@ -211,3 +209,26 @@ class TestGraphRoutes:
         expected_fields = ["graph_id", "name", "created_at", "auth_type"]
         for field in expected_fields:
             assert field in data
+
+    def test_clear_all_graphs(self):
+        """Test clearing all graphs"""
+        graph_data = {"name": "Clear All Graph"}
+        self.app.post(
+            "/api/graphs", data=json.dumps(graph_data), content_type="application/json"
+        )
+
+        response = self.app.post(
+            "/api/graphs/clear",
+            data=json.dumps({"clear_history": True, "clear_index": True}),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data.get("cleared_history") is True
+        assert data.get("cleared_index") is True
+
+        list_response = self.app.get("/api/graphs")
+        assert list_response.status_code == 200
+        graphs = json.loads(list_response.data)
+        assert graphs == []

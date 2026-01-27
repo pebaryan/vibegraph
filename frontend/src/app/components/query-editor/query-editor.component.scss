@@ -2,3 +2,87 @@
   padding: 16px;
   position: relative;
 }
+
+.editor-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.editor-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-card {
+  padding: 12px;
+}
+
+.sidebar-button {
+  width: 100%;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.prefix-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.prefix-item {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  font-family: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+}
+
+.editor-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editor-panel {
+  height: 360px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+}
+
+.editor {
+  height: 100%;
+  width: 100%;
+}
+
+.editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.history-field {
+  min-width: 240px;
+}
+
+.status {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.error {
+  color: #c62828;
+}
+
+@media (max-width: 960px) {
+  .editor-layout {
+    grid-template-columns: 1fr;
+  }
+}

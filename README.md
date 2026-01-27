@@ -3,7 +3,7 @@
 # VibeGraph
 
 A Web UI for RDFLib.
-This repository contains a lightweight backend built with Flask and a frontend Angular application that lets users query and visualize RDF data. User can create empty graph or upload from existing RDF files or connect to a SPARQL endpoint (not tested). User can explore the content of each graph by listing all classes and navigate through each URI. User can search for URI.
+This repository contains a lightweight backend built with Flask and a frontend Angular application that lets users query and visualize RDF data. User can create empty graph or upload from existing RDF files or connect to a SPARQL endpoint. User can explore the content of each graph by listing all classes and navigate through each URI. User can search for URI.
 
 ### Tools
 made with [vibe-kanban](https://github.com/BloopAI/vibe-kanban), [claude-code-router](https://github.com/musistudio/claude-code-router), [claude-code](https://claude.com/product/claude-code), [llama.cpp](https://github.com/ggml-org/llama.cpp), [gemini](https://gemini.google.com/app), [chatGPT](https://chatgpt.com/) using [GPT4-oss:20b](https://huggingface.co/ggml-org/gpt-oss-20b-GGUF)
@@ -57,9 +57,17 @@ Once both containers are up, you can access:
 | PUT    | `/api/graphs/<graph_id>`        | Update graph name. Request body: `{"name": "new name"}`                           |
 | DELETE | `/api/graphs/<graph_id>`        | Delete a graph                                                                    |
 | POST   | `/api/graphs/<graph_id>/upload` | Upload an RDF file. Use `multipart/form-data` with field `file`.                  |
+| POST   | `/api/graphs/<graph_id>/triples/delete` | Delete a triple from a graph. Request body: `{"subject": "...", "predicate": "...", "object": "..."}` |
 | POST   | `/api/queries`                  | Execute a SPARQL query. Request body: `{"query": "SELECT …", "graph_id": "<id>"}` |
 | GET    | `/api/queries/history`          | Get mock query history                                                            |
 | GET    | `/api/search`                   | Search entities. Request body: `{"query": "search text", "search_by": "label"}`   |
+| POST   | `/api/graphs/clear`             | Clear all graphs and optional history/index (testing cleanup).                    |
+| GET    | `/sparql`                       | SPARQL protocol endpoint (proxy). Query via `query=`.                             |
+| POST   | `/sparql`                       | SPARQL protocol endpoint (proxy). Query or update via content type.               |
+| GET    | `/sparql/query`                 | SPARQL read endpoint (SELECT/ASK/CONSTRUCT/DESCRIBE).                             |
+| POST   | `/sparql/query`                 | SPARQL read endpoint (SELECT/ASK/CONSTRUCT/DESCRIBE).                             |
+| POST   | `/sparql/update`                | SPARQL update endpoint (INSERT/DELETE/etc).                                       |
+| GET    | `/sparql/info`                  | SPARQL endpoint capabilities.                                                     |
 
 ---
 
@@ -84,6 +92,15 @@ curl -X POST http://localhost:5000/api/graphs/1234/upload \
 ```
 
 ```bash
+# Delete a triple
+# For literals with language or datatype, use the quoted literal form:
+#   "label"@en or "42"^^xsd:integer
+curl -X POST http://localhost:5000/api/graphs/1234/triples/delete \
+     -H "Content-Type: application/json" \
+     -d '{"subject": "http://example.org/s", "predicate": "http://example.org/p", "object": "http://example.org/o"}'
+```
+
+```bash
 # Execute a SPARQL query
 curl -X POST http://localhost:5000/api/queries \
      -H "Content-Type: application/json" \
@@ -91,10 +108,31 @@ curl -X POST http://localhost:5000/api/queries \
 ```
 
 ```bash
+# Execute a SPARQL query via protocol endpoint
+curl -X POST http://localhost:5000/sparql?graph_id=1234 \
+     -H "Content-Type: application/sparql-query" \
+     -d "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 10"
+```
+
+```bash
+# Execute a SPARQL update via protocol endpoint
+curl -X POST http://localhost:5000/sparql?graph_id=1234 \
+     -H "Content-Type: application/sparql-update" \
+     -d "INSERT DATA { <http://example.org/s> <http://example.org/p> \"o\" }"
+```
+
+```bash
 # Search entities
 curl -X POST http://localhost:5000/api/search \
      -H "Content-Type: application/json" \
      -d '{"query": "Entity 1", "search_by": "label"}'
+```
+
+```bash
+# Clear all graphs (cleanup after tests)
+curl -X POST http://localhost:5000/api/graphs/clear \
+     -H "Content-Type: application/json" \
+     -d '{"clear_history": true, "clear_index": true}'
 ```
 
 ```bash

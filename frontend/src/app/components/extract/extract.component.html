@@ -1,0 +1,111 @@
+<div class="extract-page">
+  <header class="extract-header">
+    <div>
+      <h1>Extract & Link</h1>
+      <p>Use the LLM to extract entities and relationships, then link them to your graph.</p>
+    </div>
+  </header>
+
+  <div class="extract-grid">
+    <mat-card class="input-card">
+      <mat-card-title>Text</mat-card-title>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Paste text</mat-label>
+          <textarea matInput rows="8" [formControl]="textCtrl"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Graph</mat-label>
+          <mat-select [(ngModel)]="selectedGraphId">
+            <mat-option *ngFor="let graph of graphs" [value]="graph.graph_id">
+              {{ graph.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="button-row">
+          <button mat-flat-button color="primary" (click)="extract()" [disabled]="extracting">
+            {{ extracting ? "Extracting..." : "Extract entities" }}
+          </button>
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="recommend()"
+            [disabled]="linking || !entities.length"
+          >
+            {{ linking ? "Linking..." : "Recommend graph entities" }}
+          </button>
+        </div>
+
+        <div class="error" *ngIf="error">{{ error }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="results-column">
+      <mat-accordion class="results-accordion">
+        <mat-expansion-panel expanded>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Entities</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="panel-content">
+            <div class="entity-actions" *ngIf="entities.length">
+              <button mat-button (click)="toggleAll(true)">Select all</button>
+              <button mat-button (click)="toggleAll(false)">Clear</button>
+            </div>
+            <div class="empty" *ngIf="!entities.length">No entities extracted yet.</div>
+            <div class="entity-list" *ngIf="entities.length">
+              <div class="entity-row" *ngFor="let entity of entities">
+                <mat-checkbox
+                  [checked]="selectedEntityIds.has(entity.id)"
+                  (change)="toggleEntity(entity.id, $event.checked)"
+                >
+                  <span class="entity-text">{{ entity.text }}</span>
+                  <span class="entity-meta" *ngIf="entity.type">{{ entity.type }}</span>
+                </mat-checkbox>
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Relationships</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="panel-content">
+            <div class="empty" *ngIf="!relationships.length">No relationships extracted.</div>
+            <div class="relation-list" *ngIf="relationships.length">
+              <div class="relation-row" *ngFor="let rel of relationships">
+                <span class="relation-entity">{{ entityMap[rel.subject] || rel.subject }}</span>
+                <span class="relation-predicate">{{ rel.predicate }}</span>
+                <span class="relation-entity">{{ entityMap[rel.object] || rel.object }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Recommendations</mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="panel-content">
+            <div class="empty" *ngIf="!hasRecommendations">
+              No recommendations yet.
+            </div>
+            <div class="recommendation-group" *ngFor="let entity of entities">
+              <ng-container *ngIf="recommendations[entity.id]?.length">
+                <h4>{{ entity.text }}</h4>
+                <div class="recommendation-item" *ngFor="let rec of recommendations[entity.id]">
+                  <div class="recommendation-title">
+                    {{ rec.prefixed || rec.iri }}
+                  </div>
+                  <div class="recommendation-meta">{{ rec.label }}</div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </div>
+</div>

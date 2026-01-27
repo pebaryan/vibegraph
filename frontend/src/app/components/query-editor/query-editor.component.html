@@ -2,6 +2,55 @@
   <h2>SPARQL Query Editor</h2>
   <div class="editor-layout">
     <aside class="editor-sidebar">
+      <mat-accordion>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>LLM Assistant</mat-panel-title>
+            <mat-panel-description>Generate & repair SPARQL</mat-panel-description>
+          </mat-expansion-panel-header>
+          <div class="llm-panel">
+            <mat-form-field appearance="fill" style="width: 100%">
+              <mat-label>Ask in plain English</mat-label>
+              <textarea
+                matInput
+                rows="4"
+                [formControl]="questionCtrl"
+                placeholder="e.g. List all classes and their counts"
+              ></textarea>
+            </mat-form-field>
+            <mat-form-field appearance="fill" style="width: 100%">
+              <mat-label>Graph</mat-label>
+              <mat-select [(value)]="selectedGraphId">
+                <mat-option *ngFor="let g of graphs" [value]="g.graph_id">
+                  {{ g.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-checkbox [formControl]="autoRepairCtrl">
+              Auto‑repair on error
+            </mat-checkbox>
+            <div class="llm-actions">
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="generateFromQuestion()"
+                [disabled]="generating"
+              >
+                {{ generating ? "Generating…" : "Generate SPARQL" }}
+              </button>
+              <button
+                mat-stroked-button
+                color="primary"
+                (click)="repairQuery()"
+                [disabled]="repairing"
+              >
+                {{ repairing ? "Repairing…" : "Repair Last Error" }}
+              </button>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+
       <mat-card class="sidebar-card">
         <mat-card-title>Templates</mat-card-title>
         <mat-card-content>
@@ -78,6 +127,14 @@
           Load
         </button>
         <span class="status" *ngIf="loading">Running…</span>
+      </div>
+      <div *ngIf="llmInfo" class="info">
+        {{ llmInfo }}
+        <div class="replacement-list">
+          <div *ngFor="let key of llmReplacements | keyvalue">
+            {{ key.key }} → {{ key.value }}
+          </div>
+        </div>
       </div>
       <div *ngIf="error" class="error">{{ error }}</div>
     </section>

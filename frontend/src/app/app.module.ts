@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
 import { RouterModule, Routes } from "@angular/router";
@@ -20,6 +21,7 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatTabsModule } from "@angular/material/tabs";
+import { MatExpansionModule } from "@angular/material/expansion";
 
 import { MonacoEditorModule } from "ngx-monaco-editor-v2";
 import { MomentModule } from 'ngx-moment';
@@ -36,6 +38,7 @@ import { GraphDialogComponent } from '@app/components/graph-dialog/graph-dialog.
 import { LandingHomeComponent } from '@app/components/landing-home/landing-home.component';
 import { SearchComponent } from '@app/components/search/search.component';
 import { SettingsComponent } from '@app/components/settings/settings.component';
+import { ExtractComponent } from "@app/components/extract/extract.component";
 import { PrefixDialogComponent } from "./components/prefix-dialog/prefix-dialog.component";
 import { ConfirmDialogComponent } from "./components/confirm-dialog/confirm-dialog.component";
 import { SnackbarComponent } from "./components/snackbar/snackbar.component";
@@ -46,6 +49,7 @@ const routes: Routes = [
   { path: 'graph', component: GraphViewComponent },
   { path: 'graphs', component: GraphListComponent },
   { path: 'search', component: SearchComponent },
+  { path: 'extract', component: ExtractComponent },
   { path: 'graph-navigation', component: GraphNavigationComponent },
   { path: "history", component: QueryHistoryComponent },
   { path: 'settings', component: SettingsComponent },
@@ -68,10 +72,12 @@ const routes: Routes = [
     SnackbarComponent,
     LandingHomeComponent,
     SearchComponent,
+    ExtractComponent,
     SettingsComponent
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
@@ -93,6 +99,7 @@ const routes: Routes = [
     MatCheckboxModule,
     MatAutocompleteModule,
     MatTabsModule,
+    MatExpansionModule,
     MonacoEditorModule.forRoot(),
     MomentModule,
   ],

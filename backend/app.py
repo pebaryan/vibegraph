@@ -6,6 +6,7 @@ from routes.queries import query_bp
 from routes.graphs import graph_bp
 from routes.prefixes import prefixes_bp
 from routes.sparql import sparql_bp
+from routes.llm import llm_bp
 
 # Initialize Flask application
 app = Flask(__name__)
@@ -16,6 +17,7 @@ app.register_blueprint(query_bp)
 app.register_blueprint(graph_bp)
 app.register_blueprint(prefixes_bp)
 app.register_blueprint(sparql_bp)
+app.register_blueprint(llm_bp)
 
 # This is the "Magic" step to kill the Swagger 2.0 conflict
 swagger_template = {

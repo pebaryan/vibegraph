@@ -1,72 +1,131 @@
 <div class="settings-container">
   <h2>Settings</h2>
-  <button
-    mat-button
-    mat-raised-button
-    color="primary"
-    (click)="reindexAll()"
-    [disabled]="loading"
-  >
-    {{ loading ? "Re‑indexing…" : "Re‑index All Graphs" }}
-  </button>
-  <button
-    mat-raised-button
-    color="warn"
-    class="danger-button"
-    (click)="clearAllGraphs()"
-    [disabled]="clearing"
-  >
-    {{ clearing ? "Clearing…" : "Clear All Graphs" }}
-  </button>
-  <div>
-    <a href="://localhost:5000/api-docs" target="_blank">Open API Docs</a>
-  </div>
-  <h3>Predicate Priority (Graph Navigation)</h3>
-  <mat-form-field appearance="fill" style="width: 100%">
-    <mat-label>Prefix order</mat-label>
-    <input
-      matInput
-      [formControl]="predicatePriorityCtrl"
-      placeholder="rdf,rdfs,owl"
-    />
-    <mat-hint>Comma-separated prefixes or full URI prefixes.</mat-hint>
-  </mat-form-field>
-  <button mat-button color="primary" (click)="savePredicatePriority()">
-    Save Predicate Priority
-  </button>
-  <h3>Known Namespace Prefixes</h3>
-  <button mat-button color="primary" (click)="addPrefix()">Add Prefix</button>
-  <table
-    mat-table
-    [dataSource]="prefixes"
-    class="mat-elevation-z8"
-    *ngIf="!loadingPrefixes"
-  >
-    <ng-container matColumnDef="prefix">
-      <mat-header-cell *matHeaderCellDef> Prefix </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{ element.prefix }} </mat-cell>
-    </ng-container>
-    <ng-container matColumnDef="uri">
-      <mat-header-cell *matHeaderCellDef> URI </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{ element.uri }} </mat-cell>
-    </ng-container>
-    <ng-container matColumnDef="actions">
-      <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
-      <mat-cell *matCellDef="let element">
-        <button mat-button color="accent" (click)="editPrefix(element)">
-          Edit
+  <mat-tab-group dynamicHeight [preserveContent]="true">
+    <mat-tab label="General">
+      <div class="tab-section">
+        <div class="action-row">
+          <button
+            mat-button
+            mat-raised-button
+            color="primary"
+            (click)="reindexAll()"
+            [disabled]="loading"
+          >
+            {{ loading ? "Re‑indexing…" : "Re‑index All Graphs" }}
+          </button>
+          <button
+            mat-raised-button
+            color="warn"
+            class="danger-button"
+            (click)="clearAllGraphs()"
+            [disabled]="clearing"
+          >
+            {{ clearing ? "Clearing…" : "Clear All Graphs" }}
+          </button>
+        </div>
+        <div>
+          <a href="://localhost:5000/api-docs" target="_blank">Open API Docs</a>
+        </div>
+      </div>
+    </mat-tab>
+    <mat-tab label="Prefixes">
+      <div class="tab-section">
+        <h3>Predicate Priority (Graph Navigation)</h3>
+        <mat-form-field appearance="fill" style="width: 100%">
+          <mat-label>Prefix order</mat-label>
+          <input
+            matInput
+            [formControl]="predicatePriorityCtrl"
+            placeholder="rdf,rdfs,owl"
+          />
+          <mat-hint>Comma-separated prefixes or full URI prefixes.</mat-hint>
+        </mat-form-field>
+        <button mat-button color="primary" (click)="savePredicatePriority()">
+          Save Predicate Priority
         </button>
-        <button mat-button color="warn" (click)="deletePrefix(element)">
-          Delete
-        </button>
-      </mat-cell>
-    </ng-container>
-    <mat-header-row
-      *matHeaderRowDef="['prefix', 'uri', 'actions']"
-    ></mat-header-row>
-    <mat-row
-      *matRowDef="let row; columns: ['prefix', 'uri', 'actions']"
-    ></mat-row>
-  </table>
-  <mat-spinner *ngIf="loadingPrefixes"></mat-spinner>
+        <h3>Known Namespace Prefixes</h3>
+        <button mat-button color="primary" (click)="addPrefix()">Add Prefix</button>
+        <table
+          mat-table
+          [dataSource]="prefixes"
+          class="mat-elevation-z8"
+          *ngIf="!loadingPrefixes"
+        >
+          <ng-container matColumnDef="prefix">
+            <mat-header-cell *matHeaderCellDef> Prefix </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{ element.prefix }} </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="uri">
+            <mat-header-cell *matHeaderCellDef> URI </mat-header-cell>
+            <mat-cell *matCellDef="let element"> {{ element.uri }} </mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+            <mat-cell *matCellDef="let element">
+              <button mat-button color="accent" (click)="editPrefix(element)">
+                Edit
+              </button>
+              <button mat-button color="warn" (click)="deletePrefix(element)">
+                Delete
+              </button>
+            </mat-cell>
+          </ng-container>
+          <mat-header-row
+            *matHeaderRowDef="['prefix', 'uri', 'actions']"
+          ></mat-header-row>
+          <mat-row
+            *matRowDef="let row; columns: ['prefix', 'uri', 'actions']"
+          ></mat-row>
+        </table>
+        <mat-spinner *ngIf="loadingPrefixes"></mat-spinner>
+      </div>
+    </mat-tab>
+    <mat-tab label="LLM">
+      <div class="tab-section" [formGroup]="llmForm">
+        <mat-checkbox formControlName="enabled">Enable LLM features</mat-checkbox>
+        <mat-form-field appearance="fill" style="width: 100%">
+          <mat-label>Provider</mat-label>
+          <input matInput formControlName="provider" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" style="width: 100%">
+          <mat-label>Model</mat-label>
+          <input matInput formControlName="model" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" style="width: 100%">
+          <mat-label>API Base</mat-label>
+          <input matInput formControlName="api_base" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" style="width: 100%">
+          <mat-label>API Key</mat-label>
+          <input matInput type="password" formControlName="api_key" />
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Temperature</mat-label>
+          <input matInput type="number" formControlName="temperature" />
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Max tokens</mat-label>
+          <input matInput type="number" formControlName="max_tokens" />
+        </mat-form-field>
+        <div>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="saveLlmConfig()"
+            [disabled]="savingLlm"
+          >
+            {{ savingLlm ? "Saving…" : "Save LLM Config" }}
+          </button>
+          <button
+            mat-stroked-button
+            color="primary"
+            (click)="testLlmConnection()"
+            [disabled]="testingLlm"
+          >
+            {{ testingLlm ? "Testing…" : "Test Connection" }}
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>

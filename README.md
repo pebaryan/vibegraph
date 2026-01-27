@@ -62,6 +62,8 @@ Once both containers are up, you can access:
 | POST   | `/api/queries`                  | Execute a SPARQL query. Request body: `{"query": "SELECT …", "graph_id": "<id>"}` |
 | GET    | `/api/queries/history`          | Get mock query history                                                            |
 | GET    | `/api/search`                   | Search entities. Request body: `{"query": "search text", "search_by": "label"}`   |
+| POST   | `/api/llm/extract`              | Extract entities/relationships from text. Request body: `{"text": "..."}`         |
+| POST   | `/api/llm/link`                 | Recommend graph entities. Request body: `{"graph_id": "...", "entities": [...]}`  |
 | POST   | `/api/graphs/clear`             | Clear all graphs and optional history/index (testing cleanup).                    |
 | GET    | `/sparql`                       | SPARQL protocol endpoint (proxy). Query via `query=`.                             |
 | POST   | `/sparql`                       | SPARQL protocol endpoint (proxy). Query or update via content type.               |
@@ -132,6 +134,20 @@ curl -X POST http://localhost:5000/sparql?graph_id=1234 \
 curl -X POST http://localhost:5000/api/search \
      -H "Content-Type: application/json" \
      -d '{"query": "Entity 1", "search_by": "label"}'
+```
+
+```bash
+# Extract entities and relationships
+curl -X POST http://localhost:5000/api/llm/extract \
+     -H "Content-Type: application/json" \
+     -d '{"text": "Pizza is made from dough and cheese."}'
+```
+
+```bash
+# Recommend graph entities for extracted mentions
+curl -X POST http://localhost:5000/api/llm/link \
+     -H "Content-Type: application/json" \
+     -d '{"graph_id": "1234", "entities": [{"id": "e1", "text": "Pizza"}]}'
 ```
 
 ```bash

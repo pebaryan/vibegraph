@@ -162,13 +162,20 @@ class Graph:
         # Index new triples
         numtris = 0
         for s, p, o in self.graph:
-            search_engine.add_entity(
-                {
-                    "iri": str(s),
-                    "label": str(s),
-                    "graph_id": graph_id,
-                }
-            )
+            for term in (s, p, o):
+                if not isinstance(term, URIRef):
+                    continue
+                label = None
+                for lbl in self.graph.objects(term, RDFS.label):
+                    label = str(lbl)
+                    break
+                search_engine.add_entity(
+                    {
+                        "iri": str(term),
+                        "label": label or str(term),
+                        "graph_id": graph_id,
+                    }
+                )
             numtris += 1
         print(f"indexed {numtris} triples")
 

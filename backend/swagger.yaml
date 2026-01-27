@@ -150,6 +150,51 @@ paths:
       responses:
         '200':
           description: Query result
+  /api/llm/extract:
+    post:
+      summary: Extract entities and relationships from text
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Extracted entities and relationships
+        '400':
+          description: Missing text
+  /api/llm/link:
+    post:
+      summary: Recommend entities in the graph for extracted mentions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                graph_id:
+                  type: string
+                entities:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      text:
+                        type: string
+                limit:
+                  type: integer
+      responses:
+        '200':
+          description: Entity recommendations
+        '400':
+          description: Missing graph_id or entities
   /sparql:
     get:
       summary: SPARQL protocol endpoint (proxy)

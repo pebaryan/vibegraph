@@ -3,3 +3,4 @@ vw
 search_index
 .coverage
 __pycache__
+backend/llm_config.json

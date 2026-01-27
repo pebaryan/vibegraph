@@ -18,7 +18,7 @@ def test_app_creation():
 # Test blueprint registration
 def test_blueprint_registration():
     """Test that all blueprints are registered"""
-    blueprints = ["search_bp", "query_bp", "graph_bp", "prefixes_bp", "sparql_bp"]
+    blueprints = ["search_bp", "query_bp", "graph_bp", "prefixes_bp", "sparql_bp", "llm_bp"]
     registered_blueprint_names = [bp.name for bp in app.blueprints.values()]
 
     for blueprint in blueprints:

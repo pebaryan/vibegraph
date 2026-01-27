@@ -37,6 +37,8 @@ export class GraphNavigationComponent implements OnInit {
   useDatatypeCtrl = new FormControl(false);
   datatypeCtrl = new FormControl("");
   savingLabel = false;
+  exportFormat: "turtle" | "jsonld" | "rdfxml" | "ntriples" | "trig" | "nquads" =
+    "turtle";
 
   constructor(
     private graphService: GraphService,
@@ -316,6 +318,48 @@ export class GraphNavigationComponent implements OnInit {
       this.useLangCtrl.setValue(false);
       this.langCtrl.setValue("");
     }
+  }
+
+  exportGraph() {
+    const formatMap: Record<
+      string,
+      { accept: string; ext: string }
+    > = {
+      turtle: { accept: "text/turtle", ext: "ttl" },
+      jsonld: { accept: "application/ld+json", ext: "jsonld" },
+      rdfxml: { accept: "application/rdf+xml", ext: "rdf" },
+      ntriples: { accept: "application/n-triples", ext: "nt" },
+      trig: { accept: "application/trig", ext: "trig" },
+      nquads: { accept: "application/n-quads", ext: "nq" },
+    };
+    const target = formatMap[this.exportFormat];
+    if (!target) return;
+    this.graphService
+      .exportGraph(this.graphId, this.exportFormat, target.accept)
+      .subscribe({
+        next: (payload: string) => {
+          this.downloadFile(
+            payload,
+            target.accept,
+            `graph-${this.graphId}.${target.ext}`
+          );
+        },
+        error: () => {
+          this.snackBar.open("Failed to export graph.", "Dismiss", {
+            duration: 4000,
+          });
+        },
+      });
+  }
+
+  private downloadFile(content: string, type: string, filename: string) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 
   deleteTriple(row: Triple) {

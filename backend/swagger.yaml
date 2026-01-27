@@ -90,6 +90,24 @@ paths:
       responses:
         '200':
           description: Uploaded
+  /api/graphs/{graph_id}/export:
+    get:
+      summary: Export a graph in RDF format
+      parameters:
+        - in: path
+          name: graph_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: format
+          required: false
+          schema:
+            type: string
+            enum: [turtle, ttl, jsonld, rdfxml, xml, nt, ntriples, trig, nquads, nq]
+      responses:
+        '200':
+          description: RDF graph export
   /api/graphs/{graph_id}/triples/delete:
     post:
       summary: Delete a triple from a graph

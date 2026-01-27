@@ -1,6 +1,6 @@
 import os
 import shutil
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, Response
 from models.graph import GraphManager
 from routes.search import search_engine
 from decorators import handle_errors, validate_graph_id
@@ -110,6 +110,37 @@ def upload_graph(graph_id):
         return jsonify({"message": "Graph uploaded"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+
+@graph_bp.route("/api/graphs/<graph_id>/export", methods=["GET"])
+def export_graph(graph_id):
+    graph_obj = graph_manager.get_graph_object(graph_id)
+    if not graph_obj:
+        return jsonify({"error": "Graph not found"}), 404
+    fmt = (request.args.get("format") or "turtle").lower()
+    format_map = {
+        "turtle": ("turtle", "text/turtle", "ttl"),
+        "ttl": ("turtle", "text/turtle", "ttl"),
+        "jsonld": ("json-ld", "application/ld+json", "jsonld"),
+        "rdfxml": ("xml", "application/rdf+xml", "rdf"),
+        "xml": ("xml", "application/rdf+xml", "rdf"),
+        "nt": ("nt", "application/n-triples", "nt"),
+        "ntriples": ("nt", "application/n-triples", "nt"),
+        "trig": ("trig", "application/trig", "trig"),
+        "nquads": ("nquads", "application/n-quads", "nq"),
+        "nq": ("nquads", "application/n-quads", "nq"),
+    }
+    if fmt not in format_map:
+        return jsonify({"error": "Unsupported format"}), 400
+    rdf_format, content_type, ext = format_map[fmt]
+    data = graph_obj.graph.serialize(format=rdf_format)
+    if isinstance(data, bytes):
+        data = data.decode("utf-8")
+    response = Response(data, status=200, content_type=content_type)
+    response.headers["Content-Disposition"] = (
+        f"attachment; filename=graph-{graph_id}.{ext}"
+    )
+    return response
 
 
 # Get a specific graph by ID

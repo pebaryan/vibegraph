@@ -57,6 +57,7 @@ Once both containers are up, you can access:
 | PUT    | `/api/graphs/<graph_id>`        | Update graph name. Request body: `{"name": "new name"}`                           |
 | DELETE | `/api/graphs/<graph_id>`        | Delete a graph                                                                    |
 | POST   | `/api/graphs/<graph_id>/upload` | Upload an RDF file. Use `multipart/form-data` with field `file`.                  |
+| GET    | `/api/graphs/<graph_id>/export` | Export a graph. Query param `format` supports turtle, jsonld, rdfxml, nt, trig, nquads. |
 | POST   | `/api/graphs/<graph_id>/triples/delete` | Delete a triple from a graph. Request body: `{"subject": "...", "predicate": "...", "object": "..."}` |
 | POST   | `/api/queries`                  | Execute a SPARQL query. Request body: `{"query": "SELECT …", "graph_id": "<id>"}` |
 | GET    | `/api/queries/history`          | Get mock query history                                                            |
@@ -89,6 +90,11 @@ curl http://localhost:5000/api/graphs
 # Upload RDF file to graph with ID 1234
 curl -X POST http://localhost:5000/api/graphs/1234/upload \
      -F "file=@/path/to/data.ttl"
+```
+
+```bash
+# Export a graph (turtle)
+curl -X GET "http://localhost:5000/api/graphs/1234/export?format=turtle" -o graph.ttl
 ```
 
 ```bash

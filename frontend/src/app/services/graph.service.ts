@@ -92,4 +92,11 @@ export class GraphService extends BaseService {
     }
     return this.http.post(`${this.baseUrl}/${graphId}/upload`, formData);
   }
+
+  exportGraph(graphId: string, format: string, accept: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/${graphId}/export?format=${format}`, {
+      headers: { Accept: accept },
+      responseType: 'text' as 'json'
+    });
+  }
 }

@@ -177,6 +177,26 @@
           (tripleAdded)="loadFocus()"
         ></app-add-triple>
       </mat-card>
+
+      <mat-card class="export-card">
+        <mat-card-title>Export Graph</mat-card-title>
+        <mat-card-content>
+          <mat-form-field appearance="fill" style="width: 100%">
+            <mat-label>Format</mat-label>
+            <mat-select [(value)]="exportFormat">
+              <mat-option value="turtle">Turtle (.ttl)</mat-option>
+              <mat-option value="jsonld">JSON‑LD (.jsonld)</mat-option>
+              <mat-option value="rdfxml">RDF/XML (.rdf)</mat-option>
+              <mat-option value="ntriples">N‑Triples (.nt)</mat-option>
+              <mat-option value="trig">TriG (.trig)</mat-option>
+              <mat-option value="nquads">N‑Quads (.nq)</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="exportGraph()">
+            Download
+          </button>
+        </mat-card-content>
+      </mat-card>
     </aside>
   </div>
 </div>
